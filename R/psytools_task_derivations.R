@@ -233,11 +233,11 @@ deriveSOCRATIS <- function(df) {
     #remove unneeded columns and any skip back control markers
     df <- subset(df, df$Response != 'skip_back', select=c(AgeGroup, User.code, Iteration,Language,Completed,Completed.Timestamp,Processed.Timestamp,Trial, Trial.result))
     #Select just the LAST response on each question - note that this means repeating a task will update the results - but it also takes the most recent response if they navigate backwards and then change their mind 
-    df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=T),]
+    df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=TRUE),]
     #write.csv(dfsums, "cVEDA_SOCRATIS_RAW.csv", row.names=FALSE, na='')
 
     #Summaries - currently just showing those calculated in task - let me know if there are any other ones
-    df <- subset(df, grepl("INDEX", Trial, ignore.case=T))
+    df <- subset(df, grepl("INDEX", Trial, ignore.case=TRUE))
     df <-reshape(df, direction = "wide", idvar = c("AgeGroup", "User.code", "Iteration", "Language", "Completed", "Completed.Timestamp", "Processed.Timestamp"), timevar = "Trial")
     names(df) <- gsub("Trial.result.", "", names(df))
     df$SOCRATIS_TOM_1_INDEX <- as.numeric(df$SOCRATIS_TOM_1_INDEX)
