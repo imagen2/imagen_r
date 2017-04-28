@@ -50,7 +50,7 @@ deriveSST <- function(df) {
       df <- subset(df, df$Block !='SST_Practice')
     df <-df[order(df$User.code, df$Iteration, df$rowIndex, df$Trial),]
     #Split the result column
-    options( stringsAsFactors=F )
+    options(stringsAsFactors=FALSE)
     df <- cbind(df, data.frame(do.call('rbind', strsplit(as.character(df$Trial.result),':',fixed=TRUE))))
     names(df)[names(df) == 'X1'] <- 'TrialType'
     names(df)[names(df) == 'X2'] <- 'Stimulus'
@@ -87,7 +87,7 @@ deriveMID <- function(df) {
     df <- subset(df, df$Block !='MID_PRACTICE' & df$Block !='midNRCHECK')
     df <- df[order(df$User.code, df$Iteration, df$rowIndex, df$Trial),]
     #Split the result column
-    options( stringsAsFactors=F )
+    options(stringsAsFactors=FALSE)
     df <- cbind(df, data.frame(do.call('rbind', strsplit(as.character(df$Trial.result),':',fixed=TRUE))))
     names(df)[names(df) == 'X1'] <- 'TrialResult'
     names(df)[names(df) == 'X2'] <- 'TargetDuration'
@@ -129,7 +129,7 @@ deriveWCST <- function(df) {
     }
     df <- df
     #Split the result column
-    options( stringsAsFactors=F )
+    options(stringsAsFactors=FALSE)
     df <- cbind(df, data.frame(do.call('rbind', strsplit(as.character(df$Trial.result),'_',fixed=TRUE))))
     names(df)[names(df) == 'X2'] <- 'SortCategory'
     df$Perseverations[df$X3=='PERSEV'] <- 1
@@ -285,7 +285,7 @@ deriveBART <- function(df) {
     }
 
     #Split the result column
-    options(stringsAsFactors=F)
+    options(stringsAsFactors=FALSE)
     df <- cbind(df, data.frame(do.call('rbind', strsplit(as.character(df$Trial.result),'_',fixed=TRUE))))
     names(df)[names(df) == 'X1'] <- 'TrialResult'
     names(df)[names(df) == 'X2'] <- 'PumpsMade'
@@ -318,7 +318,7 @@ deriveERT <- function(df) {
     df <- subset(df, df$Block=='MAIN')
 
     #Split the Trial column
-    options(stringsAsFactors=F)
+    options(stringsAsFactors=FALSE)
     df <- cbind(df, data.frame(do.call('rbind', strsplit(as.character(df$Trial),'_',fixed=TRUE))))
     names(df)[names(df) == 'X1'] <- 'TrialEmotion'
     names(df)[names(df) == 'X2'] <- 'TrialEmotionIndex'
@@ -355,9 +355,9 @@ deriveKIRBY<-function(df) {
     if (!checkEnvironment()) {
         stop("Can't load required libraries!")
     }
-    df <- subset(df, !grepl("FEEDBACK|js|KIRBY_PCDELAY", Block, ignore.case=T) & df$Trial.result !='skip_back')
+    df <- subset(df, !grepl("FEEDBACK|js|KIRBY_PCDELAY", Block, ignore.case=TRUE) & df$Trial.result !='skip_back')
     #Select just the LAST response on each question - note that this means repeating a task will update the results - but it also takes the most recent response if they navigate backwards and then change their mind 
-    df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=T),]
+    df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=TRUE),]
 
     #Add the computed Kind values
     df$Kind[df$Block=='KIRBY01'] <- 0.000158277936055715
@@ -445,7 +445,7 @@ deriveKIRBY<-function(df) {
         }
     }
     #Add a max consistency field
-    df <- merge(df, aggregate(Consistency~User.code+Iteration+LDRscale, function(x) c(mean = max(as.numeric(x))), data=df), by=c("User.code", "Iteration", "LDRscale"),suffixes = c("",".max"), all.x=T )
+    df <- merge(df, aggregate(Consistency~User.code+Iteration+LDRscale, function(x) c(mean = max(as.numeric(x))), data=df), by=c("User.code", "Iteration", "LDRscale"),suffixes = c("",".max"), all.x=TRUE)
     df$Kest <- NA
     # Calculate the Kest field for each max consistency - based on the geo mean of the max and preceding
     for (i in 1:nrow(df)) {
@@ -479,7 +479,7 @@ deriveKIRBY<-function(df) {
         }
     }
     #Add a max consistency field
-    df <- merge(df, aggregate(Consistency~User.code+Iteration, function(x) c(mean = max(as.numeric(x))), data=df), by=c("User.code", "Iteration"),suffixes = c("",".max"), all.x=T )
+    df <- merge(df, aggregate(Consistency~User.code+Iteration, function(x) c(mean = max(as.numeric(x))), data=df), by=c("User.code", "Iteration"),suffixes = c("",".max"), all.x=TRUE)
     df$Kest <- NA
     # Calculate the Kest field for each max consistency - based on the geo mean of the max and preceding
     for (i in 1:nrow(df)) {
