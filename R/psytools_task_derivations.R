@@ -33,7 +33,7 @@ checkEnvironment <- function() {
       list.of.packages <- c("plyr", "car")
       new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
       if (length(new.packages)) {
-        install.packages(new.packages)
+            install.packages(new.packages)
       }
       success<-lapply(list.of.packages, require, character.only = TRUE)
       return (all(success))
@@ -47,7 +47,7 @@ deriveSST <- function(df) {
     if (!checkEnvironment()) {
         stop("Can't load required libraries!")
     }
-      df <- subset(df, df$Block !='SST_Practice')
+    df <- subset(df, df$Block !='SST_Practice')
     df <-df[order(df$User.code, df$Iteration, df$rowIndex, df$Trial),]
     #Split the result column
     options(stringsAsFactors=FALSE)
