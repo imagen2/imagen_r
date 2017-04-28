@@ -28,25 +28,14 @@
 
 ## Happy to remove reliance on the Age group and row index if you prefer! Some additional flexibility can be worked in
 
-#Ensure local R environment is up to spec
-checkEnvironment <- function() {
-      list.of.packages <- c("plyr", "car")
-      new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-      if (length(new.packages)) {
-            install.packages(new.packages)
-      }
-      success<-lapply(list.of.packages, require, character.only = TRUE)
-      return (all(success))
-}
+library(car)
+library(plyr)
 
 
 #########
 ##SST
 #########
 deriveSST <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- subset(df, df$Block !='SST_Practice')
     df <-df[order(df$User.code, df$Iteration, df$rowIndex, df$Trial),]
     #Split the result column
@@ -81,9 +70,6 @@ deriveSST <- function(df) {
 ##MID
 #########
 deriveMID <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- subset(df, df$Block !='MID_PRACTICE' & df$Block !='midNRCHECK')
     df <- df[order(df$User.code, df$Iteration, df$rowIndex, df$Trial),]
     #Split the result column
@@ -124,9 +110,6 @@ deriveMID <- function(df) {
 ##WCST
 #########
 deriveWCST <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- df
     #Split the result column
     options(stringsAsFactors=FALSE)
@@ -154,9 +137,6 @@ deriveWCST <- function(df) {
 ##DS
 #########
 deriveDS <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- subset(df, df$Block !='SST_Practice')
     #Create a numerical score to sum later
     df$Corrects[df$Trial.result=="PASS"] <- 1
@@ -193,9 +173,6 @@ deriveDS <- function(df) {
 #########
 
 deriveCORSI <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- subset(df, df$Block !='P2')
 
     #Create a numerical score to sum later
@@ -233,9 +210,6 @@ deriveCORSI <- function(df) {
 #########
 #Drop the practice
 deriveTMT <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- subset(df, !grepl("Practice", Block, ignore.case=T))
 
     #Simplify the block names
@@ -254,9 +228,6 @@ deriveTMT <- function(df) {
 ##########
 ## NB this is essentially just a questionnaire - other questionnaires could be similarly processed!
 deriveSOCRATIS <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- subset(allData, !grepl("FEEDBACK|js", Block, ignore.case=T))
 
     #remove unneeded columns and any skip back control markers
@@ -280,10 +251,6 @@ deriveSOCRATIS <- function(df) {
 ##BART
 ##########
 deriveBART <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
-
     #Split the result column
     options(stringsAsFactors=FALSE)
     df <- cbind(df, data.frame(do.call('rbind', strsplit(as.character(df$Trial.result),'_',fixed=TRUE))))
@@ -312,9 +279,6 @@ deriveBART <- function(df) {
 ##ERT
 ##########
 deriveERT <- function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- subset(df, df$Block=='MAIN')
 
     #Split the Trial column
@@ -352,9 +316,6 @@ deriveERT <- function(df) {
 ##############
 ##NB again just a questionnaire
 deriveKIRBY<-function(df) {
-    if (!checkEnvironment()) {
-        stop("Can't load required libraries!")
-    }
     df <- subset(df, !grepl("FEEDBACK|js|KIRBY_PCDELAY", Block, ignore.case=TRUE) & df$Trial.result !='skip_back')
     #Select just the LAST response on each question - note that this means repeating a task will update the results - but it also takes the most recent response if they navigate backwards and then change their mind 
     df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=TRUE),]
