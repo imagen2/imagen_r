@@ -351,7 +351,7 @@ deriveERT <- function(df) {
 ##MCQ / KIRBY
 ##############
 ##NB again just a questionnaire
-deriveERT<-function(df) {
+deriveKIRBY<-function(df) {
     if (!checkEnvironment()) {
         stop("Can't load required libraries!")
     }
