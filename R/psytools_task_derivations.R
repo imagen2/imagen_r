@@ -30,13 +30,13 @@
 
 #Ensure local R environment is up to spec
 checkEnvironment <- function() {
-  list.of.packages <- c("plyr", "car")
-  new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-  if (length(new.packages)) {
-    install.packages(new.packages)
-  }
-  success<-lapply(list.of.packages, require, character.only = TRUE)
-  return(all(success))
+      list.of.packages <- c("plyr", "car")
+      new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+      if (length(new.packages)) {
+        install.packages(new.packages)
+      }
+      success<-lapply(list.of.packages, require, character.only = TRUE)
+      return (all(success))
 }
 
 
@@ -72,7 +72,7 @@ deriveSST <- function(df) {
         STOP_SUCCESS = length(which(x == "STOP_SUCCESS"))), data=df))
     dfsums <- merge(dfsums, do.call(data.frame, aggregate(cbind(StopDelay, StopHitRate)~User.code+Iteration, function(x) 
       c(mean = mean(x), sd = sd(x), final = tail(x,1)), data=subset(df, df$TrialType == 'STOP_VAR'))), by=c("User.code", "Iteration"))
-    return(dfsums)
+    return (dfsums)
 }
 #Clearly there are some people who are simply not responding for big chunks of this task - this gives them a good stop hit rate but very bad go_success rate - they will probably need to be excluded - really this should not be happening in a supervised admin situation?
 
@@ -116,7 +116,7 @@ deriveMID <- function(df) {
         FAILURE = length(which(x == "FAILURE"))), data=df))
     dfsums <- merge(dfsums, do.call(data.frame, aggregate(cbind(TargetDuration, TargetHitRate)~User.code+Iteration, function(x) 
       c(mean = mean(x), sd = sd(x), final = tail(x,1)), data=df)), by=c("User.code", "Iteration"))
-    return(dfsums)
+    return (dfsums)
 }
 
 
@@ -146,7 +146,7 @@ deriveWCST <- function(df) {
     dfsums <- do.call(data.frame, aggregate(cbind(Corrects, Switches, Perseverations)~AgeGroup+User.code+Iteration+Language+Completed+Completed.Timestamp+Processed.Timestamp, FUN=sum, na.rm=TRUE, na.action=NULL, data=df))
     dfsums <- merge(dfsums, do.call(data.frame, aggregate(cbind(Response.time..ms.)~User.code+Iteration, function(x) 
       c(mean = mean(x), sd = sd(x)), data=df)), by=c("User.code", "Iteration"))
-    return(dfsums)
+    return (dfsums)
 }
 
 
@@ -184,7 +184,7 @@ deriveDS <- function(df) {
     dfsums$SpanB[dfsums$Corrects.B_8>1] <- 8
     dfsums$SpanB[dfsums$Corrects.B_9>1] <- 9
     dfsums$SpanB[dfsums$Corrects.B_10>1] <- 10
-    return(dfsums)
+    return (dfsums)
 }
 
 
@@ -225,7 +225,7 @@ deriveCORSI <- function(df) {
     dfsums$SpanB[dfsums$Corrects.B9>0] <- 9
     dfsums$SpanB[dfsums$Corrects.B10>0] <- 10
 
-    return(dfsums)
+    return (dfsums)
 }
 
 #########
@@ -245,7 +245,7 @@ deriveTMT <- function(df) {
     #Summaries
     dfsums <- do.call(data.frame, aggregate(cbind(Response.time..ms., Incorrect.responses, Wild.responses)~AgeGroup+User.code+Iteration+Language+Completed+Completed.Timestamp+Processed.Timestamp+Block, FUN=sum, na.rm=TRUE, na.action=NULL, data=df))
     dfsums <- reshape(dfsums, direction = "wide", idvar = c("AgeGroup", "User.code", "Iteration", "Language", "Completed", "Completed.Timestamp", "Processed.Timestamp"), timevar = "Block")
-    return(dfsums)
+    return (dfsums)
 }
 
                                                         
@@ -272,7 +272,7 @@ deriveSOCRATIS <- function(df) {
     df$SOCRATIS_TOM_1_INDEX <- as.numeric(df$SOCRATIS_TOM_1_INDEX)
     df$SOCRATIS_TOM_2_INDEX <- as.numeric(df$SOCRATIS_TOM_2_INDEX)
     df$SOCRATIS_FAUS_PAS_INDEX <- as.numeric(df$SOCRATIS_FAUS_PAS_INDEX)
-    return(df)
+    return (df)
 }
 
 
@@ -304,7 +304,7 @@ deriveBART <- function(df) {
     names(dfsums)[names(dfsums) == 'TrialResult'] <- 'NumPopped'
     dfsums <- reshape(dfsums, direction = "wide", idvar = c("AgeGroup", "User.code", "Iteration", "Language", "Completed", "Completed.Timestamp", "Processed.Timestamp"), timevar = "BalloonColour")
     
-    return(dfsums)
+    return (dfsums)
 }
 
 
@@ -344,7 +344,7 @@ deriveERT <- function(df) {
     dfsums$RTincorrect <- recode(dfsums$RTincorrect, 'NaN=NA')
     dfsums<-reshape(dfsums, direction = "wide", idvar = c("AgeGroup", "User.code", "Iteration", "Language", "Completed", "Completed.Timestamp", "Processed.Timestamp"), timevar = "TrialEmotion")
     
-    return(dfsums)
+    return (dfsums)
 }
 
 ###############
@@ -494,5 +494,5 @@ deriveKIRBY<-function(df) {
       dfsums,
       by=c("User.code", "Iteration"))
 
-    return(dfsums)
+    return (dfsums)
 }
