@@ -210,7 +210,7 @@ deriveCORSI <- function(df) {
 #########
 #Drop the practice
 deriveTMT <- function(df) {
-    df <- subset(df, !grepl("Practice", Block, ignore.case=T))
+    df <- subset(df, !grepl("Practice", Block, ignore.case=TRUE))
 
     #Simplify the block names
     df$Block <- gsub("TMT_", "", df$Block)
@@ -228,10 +228,10 @@ deriveTMT <- function(df) {
 ##########
 ## NB this is essentially just a questionnaire - other questionnaires could be similarly processed!
 deriveSOCRATIS <- function(df) {
-    df <- subset(allData, !grepl("FEEDBACK|js", Block, ignore.case=T))
+    df <- subset(allData, !grepl("FEEDBACK|js", Block, ignore.case=TRUE))
 
     #remove unneeded columns and any skip back control markers
-    df <- subset(df, df$Response != 'skip_back',  select=c(AgeGroup, User.code, Iteration,Language,Completed,Completed.Timestamp,Processed.Timestamp,Trial, Trial.result))
+    df <- subset(df, df$Response != 'skip_back', select=c(AgeGroup, User.code, Iteration,Language,Completed,Completed.Timestamp,Processed.Timestamp,Trial, Trial.result))
     #Select just the LAST response on each question - note that this means repeating a task will update the results - but it also takes the most recent response if they navigate backwards and then change their mind 
     df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=T),]
     #write.csv(dfsums, "cVEDA_SOCRATIS_RAW.csv", row.names=FALSE, na='')
@@ -260,7 +260,7 @@ deriveBART <- function(df) {
     #remove the index fromteh trial column so it can serve as the Colour factor
     df$BalloonColour <- toupper(gsub("[0-9]", "", df$Trial))
     #remove unneeded columns 
-    df <- subset(df,  select=c(AgeGroup,User.code, Iteration,Language,Completed,Completed.Timestamp,Processed.Timestamp,BalloonColour,TrialResult, PumpsMade))
+    df <- subset(df, select=c(AgeGroup, User.code, Iteration, Language, Completed, Completed.Timestamp, Processed.Timestamp, BalloonColour, TrialResult, PumpsMade))
     #write.csv(df, "cVEDA_BART_RAW.csv", row.names=FALSE, na='')
 
     #Summaries
@@ -298,7 +298,7 @@ deriveERT <- function(df) {
 
 
     #remove unneeded columns 
-    df <- subset(df,  select=c(User.code, Iteration,Language,Completed,Completed.Timestamp,Processed.Timestamp,Trial,Response, Response.time..ms.,TrialEmotion,TrialEmotionIndex, Correct, RTcorrect, RTincorrect))
+    df <- subset(df, select=c(AgeGroup, User.code, Iteration, Language, Completed, Completed.Timestamp, Processed.Timestamp, Trial, Response, Response.time..ms., TrialEmotion, TrialEmotionIndex, Correct, RTcorrect, RTincorrect))
     #write.csv(df, "cVEDA_ERT_RAW.csv", row.names=FALSE, na='')
 
     #Summaries
