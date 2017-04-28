@@ -228,7 +228,7 @@ deriveTMT <- function(df) {
 ##########
 ## NB this is essentially just a questionnaire - other questionnaires could be similarly processed!
 deriveSOCRATIS <- function(df) {
-    df <- subset(allData, !grepl("FEEDBACK|js", Block, ignore.case=TRUE))
+    df <- subset(df, !grepl("FEEDBACK|js", Block, ignore.case=TRUE))
 
     #remove unneeded columns and any skip back control markers
     df <- subset(df, df$Response != 'skip_back', select=c(AgeGroup, User.code, Iteration,Language,Completed,Completed.Timestamp,Processed.Timestamp,Trial, Trial.result))
