@@ -123,7 +123,7 @@ deriveWCST <- function(df) {
 
     # Flag each switch for summing
     df$Switches <- 0
-    df$Switches[df$SortCategory != df$SortCategory[-1] & df$User.code==df$User.code[-1] & df$Iteration==df$Iteration[-1] ] <- 1
+    df$Switches[df$SortCategory != df$SortCategory[-1] & df$User.code == df$User.code[-1] & df$Iteration == df$Iteration[-1]] <- 1
 
     #Summaries
     dfsums <- do.call(data.frame, aggregate(cbind(Corrects, Switches, Perseverations)~AgeGroup+User.code+Iteration+Language+Completed+Completed.Timestamp+Processed.Timestamp, FUN=sum, na.rm=TRUE, na.action=NULL, data=df))
