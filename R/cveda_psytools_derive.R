@@ -32,8 +32,7 @@
     path <- getSrcDirectory(.scriptpath)
     if (length(path) == 0) {
         args <- commandArgs(trailingOnly=FALSE)
-        path <- sub("--file=", "", args[grep("--file", args)])
-        path = dirname(path)
+        path <- dirname(sub("--file=", "", args[grep("--file", args)]))
     }
     return (path)
 }
