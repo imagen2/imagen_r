@@ -28,13 +28,21 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
+options(warn=2)
+options(error = function() traceback(2))
+
 
 .scriptpath <- function() {
-    args <- commandArgs(trailingOnly=FALSE)
-    path <- sub("--file=", "", args[grep("--file", args)])
-    return (dirname(path))
+    path <- getSrcDirectory(.scriptpath)
+    if (length(path) == 0) {
+        args <- commandArgs(trailingOnly=FALSE)
+        path <- sub("--file=", "", args[grep("--file", args)])
+        path = dirname(path)
+    }
+    return (path)
 }
-source(file.path(.scriptpath(), "psytools_task_derivations.R"))
+path <- .scriptpath()
+source(file.path(path, "psytools_task_derivations.R"))
 
 
 PSYTOOLS_PSC2_DIR <- '/cveda/databank/RAW/PSC2/psytools'
