@@ -28,10 +28,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
-options(warn=2)
-options(error = function() traceback(2))
-
-
 .scriptpath <- function() {
     path <- getSrcDirectory(.scriptpath)
     if (length(path) == 0) {
