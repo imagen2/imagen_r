@@ -28,16 +28,13 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
-source_here <- function(x, ...) {
-    frame <- sys.frame(1)
-    if (!is.null(frame$ofile)) {
-        frame_dir <- dirname(frame$ofile)
-        source(file.path(frame_dir, x), ...)
-    } else {
-        source(x, ...)
-    }
+
+.scriptpath <- function() {
+    args <- commandArgs(trailingOnly=FALSE)
+    path <- sub("--file=", "", args[grep("--file", args)])
+    return (dirname(path))
 }
-source_here("psytools_task_derivations.R")
+source(file.path(.scriptpath(), "psytools_task_derivations.R"))
 
 
 PSYTOOLS_PSC2_DIR <- '/cveda/databank/RAW/PSC2/psytools'
