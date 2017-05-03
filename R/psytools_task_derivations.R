@@ -113,7 +113,7 @@ deriveWCST <- function(df) {
     df <- df
     #Split the result column
     options(stringsAsFactors=FALSE)
-    df <- cbind(df, data.frame(do.call('rbind', strsplit(as.character(df$Trial.result),'_',fixed=TRUE))))
+    df <- suppressWarnings(cbind(df, data.frame(do.call('rbind', strsplit(as.character(df$Trial.result),'_',fixed=TRUE)))))
     names(df)[names(df) == 'X2'] <- 'SortCategory'
     df$Perseverations[df$X3=='PERSEV'] <- 1
     df$Corrects[df$X1=='PASS'] <- 1
@@ -123,7 +123,7 @@ deriveWCST <- function(df) {
 
     # Flag each switch for summing
     df$Switches <- 0
-    df$Switches[df$SortCategory != df$SortCategory[-1] & df$User.code == df$User.code[-1] & df$Iteration == df$Iteration[-1]] <- 1
+    df$Switches[df$SortCategory != c(df$SortCategory[-1], NA) & df$User.code == c(df$User.code[-1], NA) & df$Iteration == c(df$Iteration[-1], NA)] <- 1
 
     #Summaries
     dfsums <- do.call(data.frame, aggregate(cbind(Corrects, Switches, Perseverations)~AgeGroup+User.code+Iteration+Language+Completed+Completed.Timestamp+Processed.Timestamp, FUN=sum, na.rm=TRUE, na.action=NULL, data=df))
