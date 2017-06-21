@@ -60,8 +60,8 @@ deriveSST <- function(df) {
         STOP_TOO_EARLY = length(which(x == "STOP_TOO_EARLY")),
         STOP_FAIL = length(which(x == "STOP_FAIL")),
         STOP_SUCCESS = length(which(x == "STOP_SUCCESS"))), data=df))
-    dfsums <- merge(dfsums, do.call(data.frame, aggregate(cbind(StopDelay, StopHitRate)~User.code+Iteration, function(x) 
-      c(mean = mean(x), sd = sd(x), final = tail(x,1)), data=subset(df, df$TrialType == 'STOP_VAR'))), by=c("User.code", "Iteration"))
+    dfsums <- merge(dfsums, do.call(data.frame, aggregate(cbind(StopDelay, StopHitRate)~User.code+Iteration, function(x)
+                    c(mean = mean(x), sd = sd(x), final = tail(x,1)), data=subset(df, df$TrialType == 'STOP_VAR'))), by=c("User.code", "Iteration"))
     return (dfsums)
 }
 #Clearly there are some people who are simply not responding for big chunks of this task - this gives them a good stop hit rate but very bad go_success rate - they will probably need to be excluded - really this should not be happening in a supervised admin situation?
@@ -129,7 +129,7 @@ deriveWCST <- function(df) {
     #Summaries
     dfsums <- do.call(data.frame, aggregate(cbind(Corrects, Switches, Perseverations)~AgeGroup+User.code+Iteration+Language+Completed+Completed.Timestamp+Processed.Timestamp, FUN=sum, na.rm=TRUE, na.action=NULL, data=df))
     dfsums <- merge(dfsums, do.call(data.frame, aggregate(cbind(Response.time..ms.)~User.code+Iteration, function(x) 
-      c(mean = mean(x), sd = sd(x)), data=df)), by=c("User.code", "Iteration"))
+                    c(mean = mean(x), sd = sd(x)), data=df)), by=c("User.code", "Iteration"))
     return (dfsums)
 }
 
@@ -268,7 +268,7 @@ deriveBART <- function(df) {
     dfsums <- do.call(data.frame, aggregate(cbind(PumpsMade)~AgeGroup+User.code+Iteration+Language+Completed+Completed.Timestamp+Processed.Timestamp+BalloonColour+TrialResult, FUN=sum, na.rm=TRUE, na.action=NULL, data=df))
     dfsums <- reshape(dfsums, direction = "wide", idvar = c("AgeGroup", "User.code", "Iteration", "Language", "Completed", "Completed.Timestamp", "Processed.Timestamp", "BalloonColour"), timevar = "TrialResult")
     dfsums <- merge(do.call(data.frame, aggregate(cbind(TrialResult)~User.code+Iteration+BalloonColour, function(x)
-      c(NumPopped = length(which(x == "POPPED"))), data=df)), dfsums, by=c("User.code", "Iteration", "BalloonColour"))
+                            c(NumPopped = length(which(x == "POPPED"))), data=df)), dfsums, by=c("User.code", "Iteration", "BalloonColour"))
     names(dfsums)[names(dfsums) == 'TrialResult'] <- 'NumPopped'
     dfsums <- reshape(dfsums, direction = "wide", idvar = c("AgeGroup", "User.code", "Iteration", "Language", "Completed", "Completed.Timestamp", "Processed.Timestamp"), timevar = "BalloonColour")
     
