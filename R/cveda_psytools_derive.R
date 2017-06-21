@@ -28,6 +28,14 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
+library(tools)
+
+
+PSYTOOLS_PSC2_DIR <- '/cveda/databank/RAW/PSC1/psytools'
+PSYTOOLS_PROCESSED_DIR <- '/tmp/databank/processed/psytools'
+
+
+# Import derivation and helper functions from the script's directory
 .scriptpath <- function() {
     path <- getSrcDirectory(.scriptpath)
     if (length(path) == 0) {
@@ -39,9 +47,6 @@
 path <- .scriptpath()
 source(file.path(path, "psytools_task_derivations.R"))
 
-
-PSYTOOLS_PSC2_DIR <- '/cveda/databank/RAW/PSC2/psytools'
-PSYTOOLS_PROCESSED_DIR <- '/cveda/databank/processed/psytools'
 
 DERIVATION = c(
     "cVEDA-cVEDA_SOCRATIS-BASIC_DIGEST"=deriveSOCRATIS,
@@ -55,45 +60,51 @@ DERIVATION = c(
     "cVEDA-cVEDA_CORSI-BASIC_DIGEST"=deriveCORSI,
     "cVEDA-cVEDA_DS-BASIC_DIGEST"=deriveDS)
 
-
-derivation <- function(path) {
-    for (name in names(DERIVATION)) {
-        if (length(grep(name, c(path)))) {
-            return (name)
-        }
-    }
-    return (NULL)
-}
-
-
+# Iterate over exported CSV Psytools files
 for (filename in list.files(PSYTOOLS_PSC2_DIR)) {
-    derivation_name <- derivation(filename)
-    if (!is.null(derivation_name)) {
-        filepath <- file.path(PSYTOOLS_PSC2_DIR, filename)
-        COL_CLASSES = c(
-            "User.code"="character",
-            "Block"="character",
-            "Trial"="character",
-            "Response.time..ms."="numeric")
-        df <- read.csv(filepath, colClasses=COL_CLASSES)
+    # The name of the questionnaire is based on the CSV file name
+    name <- file_path_sans_ext(filename)
 
-        df$TaskID <- derivation_name
-        # Dicard uncomplete trials
-        df <- subset(df, df$Completed=='t')
-        # Get rid of Demo, MOCK, NPPILOT and TEST logins (PSC1-only)
-        df <- subset(df, !grepl("Demo|MOCK|NPPILOT|TEST", User.code, ignore.case=TRUE))
-        # Add an index to preserve order (to simplify eyeballing)
-        df$rowIndex <- seq_len(nrow(df))
-        # Add an age group
+    # Read each exported CSV Psytools file into a data frame
+    filepath <- file.path(PSYTOOLS_PSC2_DIR, filename)
+    COL_CLASSES = c(
+        "User.code"="character",
+        "Block"="character",
+        "Trial"="character",
+        "Response.time..ms."="numeric")
+    df <- read.csv(filepath, colClasses=COL_CLASSES)
+
+    # Remove invalid data from data frame
+    # Discard uncomplete trials
+    df <- subset(df, df$Completed=='t')
+    # Get rid of Demo, MOCK, NPPILOT and TEST logins (PSC1-only)
+    df <- subset(df, !grepl("Demo|MOCK|NPPILOT|TEST", User.code, ignore.case=TRUE))
+
+    # Add bells & whistles to data frame before pre-processing
+    # Give it a proper name
+    df$TaskID <- name
+    # Add an index to preserve order (to simplify eyeballing)
+    df$rowIndex <- seq_len(nrow(df))
+
+    # Apply specific derivation function to relevant questionnaires
+    if (name %in% names(DERIVATION)) {
+        # Add an age group, required by current derivation functions
         df$AgeGroup <- as.numeric(substr(df$User.code, 15, 15))
-
-        derivation_function = DERIVATION[[derivation_name]]
-        result = derivation_function(df)
-
+        # Apply derivation function
+        derivation_function = DERIVATION[[name]]
+        print("derivation...")
+        print(name)
+        df <- derivation_function(df)
         # Remove age group
-        result$AgeGroup <- NULL
-
-        filepath <- file.path(PSYTOOLS_PROCESSED_DIR, filename)
-        write.csv(result, filepath, row.names=FALSE, quote=FALSE, na="")
+        df$AgeGroup <- NULL
+    } else {
+        print("rotateQuestionnaire")
+        print(name)
+        # Rotate all data frames from long to wide format
+        df <- rotateQuestionnaire(df)
     }
+
+    # Write data frame back to processed CSV file
+    filepath <- file.path(PSYTOOLS_PROCESSED_DIR, filename)
+    write.csv(df, filepath, row.names=FALSE, quote=FALSE, na="")
 }
