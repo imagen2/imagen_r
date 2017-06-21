@@ -472,6 +472,6 @@ rotateQs <- function(df) {
     df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=T),]
 
     df <- dcast(subset(df, select=c(User.code, Iteration, Trial, Trial.result)), User.code+Iteration ~ Trial)
-    return(df)
+    return (df)
 }
 
