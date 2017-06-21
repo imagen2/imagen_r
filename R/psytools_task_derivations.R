@@ -315,7 +315,7 @@ deriveERT <- function(df) {
 ##MCQ / KIRBY
 ##############
 ##NB again just a questionnaire
-deriveKIRBY<-function(df) {
+deriveKIRBY <- function(df) {
     df <- subset(df, !grepl("FEEDBACK|js|KIRBY_PCDELAY", Block, ignore.case=TRUE) & df$Trial.result !='skip_back')
     #Select just the LAST response on each question - note that this means repeating a task will update the results - but it also takes the most recent response if they navigate backwards and then change their mind 
     df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=TRUE),]
@@ -466,12 +466,12 @@ deriveKIRBY<-function(df) {
 ##########
 rotateQs <- function(df) {
     #Remove the results generated when displaying the feedback from instruments such as the Mini
-    df<- subset(df, !grepl("FEEDBACK", Block, ignore.case=T) & Response !='skip_back')
+    df <- subset(df, !grepl("FEEDBACK", Block, ignore.case=T) & Response !='skip_back')
 
     #Select only the last response for each question in cases of skipping back and revising.
-    df<-df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=T),]
+    df <- df[!duplicated(subset(df, select=c(User.code, Iteration, Trial)), fromLast=T),]
 
-    df<-dcast(subset(df, select=c(User.code, Iteration, Trial, Trial.result)), User.code+Iteration ~ Trial)
+    df <- dcast(subset(df, select=c(User.code, Iteration, Trial, Trial.result)), User.code+Iteration ~ Trial)
     return(df)
 }
 
