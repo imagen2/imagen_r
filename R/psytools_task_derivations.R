@@ -30,6 +30,7 @@
 
 library(car)
 library(plyr)
+library(reshape2)
 
 
 #########
@@ -464,7 +465,7 @@ deriveKIRBY <- function(df) {
 ## Removes repeated Trial results caused by skipping back
 ## Should work for any questionnaire to rotate into a wide format, but may want some additional honing!                         
 ##########
-rotateQs <- function(df) {
+rotateQuestionnaire <- function(df) {
     #Remove the results generated when displaying the feedback from instruments such as the Mini
     df <- subset(df, !grepl("FEEDBACK", Block, ignore.case=T) & Response !='skip_back')
 
