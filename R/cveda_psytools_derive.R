@@ -48,7 +48,7 @@ path <- .scriptpath()
 source(file.path(path, "psytools_task_derivations.R"))
 
 
-DERIVATION = c(
+DERIVATION = list(
     "cVEDA-cVEDA_SOCRATIS-BASIC_DIGEST"=deriveSOCRATIS,
     "cVEDA-cVEDA_SST-BASIC_DIGEST"=deriveSST,
     "cVEDA-cVEDA_KIRBY-BASIC_DIGEST"=deriveKIRBY,
