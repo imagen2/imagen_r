@@ -29,24 +29,11 @@
 # knowledge of the CeCILL license and that you accept its terms.
 
 library(tools)
+library(Psytools)
 
 
 PSYTOOLS_PSC2_DIR <- '/cveda/databank/RAW/PSC1/psytools'
-PSYTOOLS_PROCESSED_DIR <- '/tmp/databank/processed/psytools'
-
-
-# Import derivation and helper functions from the script's directory
-.scriptpath <- function() {
-    path <- getSrcDirectory(.scriptpath)
-    if (length(path) == 0) {
-        args <- commandArgs(trailingOnly=FALSE)
-        path <- dirname(sub("--file=", "", args[grep("--file", args)]))
-    }
-    return (path)
-}
-path <- .scriptpath()
-source(file.path(path, "psytools_task_derivations.R"))
-
+PSYTOOLS_PROCESSED_DIR <- '/cveda/databank/processed/psytools'
 
 DERIVATION = list(
     "cVEDA-cVEDA_SOCRATIS-BASIC_DIGEST"=deriveSOCRATIS,
@@ -92,14 +79,10 @@ for (filename in list.files(PSYTOOLS_PSC2_DIR)) {
         df$AgeGroup <- as.numeric(substr(df$User.code, 15, 15))
         # Apply derivation function
         derivation_function = DERIVATION[[name]]
-        print("derivation...")
-        print(name)
         df <- derivation_function(df)
         # Remove age group
         df$AgeGroup <- NULL
     } else {
-        print("rotateQuestionnaire")
-        print(name)
         # Rotate all data frames from long to wide format
         df <- rotateQuestionnaire(df)
     }
