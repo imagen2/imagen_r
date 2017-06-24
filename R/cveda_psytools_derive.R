@@ -71,8 +71,6 @@ for (filename in list.files(PSYTOOLS_PSC2_DIR)) {
     # Get rid of Demo, MOCK, NPPILOT and TEST user codes (PSC1-only)
     df <- subset(df, !grepl("Demo|MOCK|NPPILOT|TEST", User.code, ignore.case=TRUE))
 
-    # Give the data frame a nice name
-    df$TaskID <- name
     # Add an index to preserve order (to simplify eyeballing)
     df$rowIndex <- seq_len(nrow(df))
 
@@ -80,7 +78,10 @@ for (filename in list.files(PSYTOOLS_PSC2_DIR)) {
     derivation_function <- derivation(name)
     df <- derivation_function(df)
 
-    # Write data frame back to processed CSV file
+    # Write data frame back to the processed CSV file
     filepath <- file.path(PSYTOOLS_PROCESSED_DIR, filename)
-    write.csv(df, filepath, row.names=FALSE, quote=FALSE, na="")
+    columns <- sub("\\.ms\\.", "[ms]", colnames(df))  # Response time [ms]
+    columns <- gsub("\\.", " ", columns)
+    write.table(df, filepath, quote=FALSE, sep=",", na="",
+                row.names=FALSE, col.names=columns)
 }
