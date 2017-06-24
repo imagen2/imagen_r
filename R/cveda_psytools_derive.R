@@ -35,17 +35,22 @@ library(Psytools)
 PSYTOOLS_PSC2_DIR <- '/cveda/databank/RAW/PSC1/psytools'
 PSYTOOLS_PROCESSED_DIR <- '/cveda/databank/processed/psytools'
 
-DERIVATION = list(
-    "cVEDA-cVEDA_SOCRATIS-BASIC_DIGEST"=deriveSOCRATIS,
-    "cVEDA-cVEDA_SST-BASIC_DIGEST"=deriveSST,
-    "cVEDA-cVEDA_KIRBY-BASIC_DIGEST"=deriveKIRBY,
-    "cVEDA-cVEDA_BART-BASIC_DIGEST"=deriveBART,
-    "cVEDA-cVEDA_ERT-BASIC_DIGEST"=deriveERT,
-    "cVEDA-cVEDA_MID-BASIC_DIGEST"=deriveMID,
-    "cVEDA-cVEDA_TMT-TMT_DIGEST"=deriveTMT,
-    "cVEDA-cVEDA_WCST-BASIC_DIGEST"=deriveWCST,
-    "cVEDA-cVEDA_CORSI-BASIC_DIGEST"=deriveCORSI,
-    "cVEDA-cVEDA_DS-BASIC_DIGEST"=deriveDS)
+
+derivation <- function(name) {
+    switch(name,
+           "cVEDA-cVEDA_SOCRATIS-BASIC_DIGEST"=deriveSOCRATIS,
+           "cVEDA-cVEDA_SST-BASIC_DIGEST"=deriveSST,
+           "cVEDA-cVEDA_KIRBY-BASIC_DIGEST"=deriveKIRBY,
+           "cVEDA-cVEDA_BART-BASIC_DIGEST"=deriveBART,
+           "cVEDA-cVEDA_ERT-BASIC_DIGEST"=deriveERT,
+           "cVEDA-cVEDA_MID-BASIC_DIGEST"=deriveMID,
+           "cVEDA-cVEDA_TMT-TMT_DIGEST"=deriveTMT,
+           "cVEDA-cVEDA_WCST-BASIC_DIGEST"=deriveWCST,
+           "cVEDA-cVEDA_CORSI-BASIC_DIGEST"=deriveCORSI,
+           "cVEDA-cVEDA_DS-BASIC_DIGEST"=deriveDS,
+           rotateQuestionnaire)  # default fits all other questionnaires
+}
+
 
 # Iterate over exported CSV Psytools files
 for (filename in list.files(PSYTOOLS_PSC2_DIR)) {
@@ -61,31 +66,19 @@ for (filename in list.files(PSYTOOLS_PSC2_DIR)) {
         "Response.time..ms."="numeric")
     df <- read.csv(filepath, colClasses=COL_CLASSES)
 
-    # Remove invalid data from data frame
     # Discard uncomplete trials
     df <- subset(df, df$Completed=='t')
-    # Get rid of Demo, MOCK, NPPILOT and TEST logins (PSC1-only)
+    # Get rid of Demo, MOCK, NPPILOT and TEST user codes (PSC1-only)
     df <- subset(df, !grepl("Demo|MOCK|NPPILOT|TEST", User.code, ignore.case=TRUE))
 
-    # Add bells & whistles to data frame before pre-processing
-    # Give it a proper name
+    # Give the data frame a nice name
     df$TaskID <- name
     # Add an index to preserve order (to simplify eyeballing)
     df$rowIndex <- seq_len(nrow(df))
 
-    # Apply specific derivation function to relevant questionnaires
-    if (name %in% names(DERIVATION)) {
-        # Add an age group, required by current derivation functions
-        df$AgeGroup <- as.numeric(substr(df$User.code, 15, 15))
-        # Apply derivation function
-        derivation_function = DERIVATION[[name]]
-        df <- derivation_function(df)
-        # Remove age group
-        df$AgeGroup <- NULL
-    } else {
-        # Rotate all data frames from long to wide format
-        df <- rotateQuestionnaire(df)
-    }
+    # Apply relevant derivation function to each questionnaire
+    derivation_function <- derivation(name)
+    df <- derivation_function(df)
 
     # Write data frame back to processed CSV file
     filepath <- file.path(PSYTOOLS_PROCESSED_DIR, filename)
