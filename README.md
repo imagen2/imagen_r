@@ -1,4 +1,4 @@
-Derivations for c-VEDA tasks
+Derivations for Imagen tasks
 ============================
 
 R scripts to process Psytools datasets exported as CSV files

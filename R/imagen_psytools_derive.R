@@ -32,22 +32,12 @@ library(tools)
 library(Psytools)
 
 
-PSYTOOLS_PSC2_DIR <- '/cveda/databank/RAW/PSC1/psytools'
-PSYTOOLS_PROCESSED_DIR <- '/cveda/databank/processed/psytools'
+PSYTOOLS_PSC2_DIR <- '/neurospin/imagen/BL/RAW/PSC1/psytools'
+PSYTOOLS_PROCESSED_DIR <- '/tmp/psytools'
 
 
 derivation <- function(name) {
     switch(name,
-           "cVEDA-cVEDA_SOCRATIS-BASIC_DIGEST"=deriveSOCRATIS,
-           "cVEDA-cVEDA_SST-BASIC_DIGEST"=deriveSST,
-           "cVEDA-cVEDA_KIRBY-BASIC_DIGEST"=deriveKIRBY,
-           "cVEDA-cVEDA_BART-BASIC_DIGEST"=deriveBART,
-           "cVEDA-cVEDA_ERT-BASIC_DIGEST"=deriveERT,
-           "cVEDA-cVEDA_MID-BASIC_DIGEST"=deriveMID,
-           "cVEDA-cVEDA_TMT-TMT_DIGEST"=deriveTMT,
-           "cVEDA-cVEDA_WCST-BASIC_DIGEST"=deriveWCST,
-           "cVEDA-cVEDA_CORSI-BASIC_DIGEST"=deriveCORSI,
-           "cVEDA-cVEDA_DS-BASIC_DIGEST"=deriveDS,
            rotateQuestionnaire)  # default fits all other questionnaires
 }
 
