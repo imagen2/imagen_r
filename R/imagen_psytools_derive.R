@@ -58,8 +58,8 @@ for (filename in list.files(PSYTOOLS_PSC2_DIR)) {
 
     # Discard uncomplete trials
     df <- subset(df, df$Completed=='t')
-    # Get rid of Demo, MOCK, NPPILOT and TEST user codes (PSC1-only)
-    df <- subset(df, !grepl("Demo|MOCK|NPPILOT|TEST", User.code, ignore.case=TRUE))
+    # Get rid of TEST, THOMAS_PRONK and MAREN user codes (PSC1-only)
+    df <- subset(df, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case=TRUE))
 
     # Add an index to preserve order (to simplify eyeballing)
     df$rowIndex <- seq_len(nrow(df))
