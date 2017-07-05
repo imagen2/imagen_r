@@ -70,7 +70,6 @@ process <- function(psc2_dir, processed_dir) {
         # The name of the questionnaire is based on the CSV file name
         name <- file_path_sans_ext(filename)
 
-        print(name)
         if (name %in% BOGUS) {
             next
         }
