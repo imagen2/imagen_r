@@ -32,46 +32,80 @@ library(tools)
 library(Psytools)
 
 
-PSYTOOLS_PSC2_DIR <- '/neurospin/imagen/BL/RAW/PSC1/psytools'
-PSYTOOLS_PROCESSED_DIR <- '/tmp/psytools'
+PSYTOOLS_BL_PSC2_DIR <- '/neurospin/imagen/BL/RAW/PSC1/psytools'
+PSYTOOLS_BL_PROCESSED_DIR <- '/home/dp165978/WORK_IN_PROGRESS/imagen/PSYTOOLS/R/BL'
+PSYTOOLS_FU1_PSC2_DIR <- '/neurospin/imagen/FU1/RAW/PSC1/psytools'
+PSYTOOLS_FU1_PROCESSED_DIR <- '/home/dp165978/WORK_IN_PROGRESS/imagen/PSYTOOLS/R/FU1'
+PSYTOOLS_FU2_PSC2_DIR <- '/neurospin/imagen/FU2/RAW/PSC1/psytools'
+PSYTOOLS_FU2_PROCESSED_DIR <- '/home/dp165978/WORK_IN_PROGRESS/imagen/PSYTOOLS/R/FU2'
+
+BOGUS <- list(# BL
+              "IMAGEN-IMGN_CTS_PARENT_RC5-BASIC_DIGEST",
+              "IMAGEN-IMGN_KIRBY_RC5-IMAGEN_KIRBY_DIGEST",
+              # FU1
+              "IMAGEN-IMGN_FU_RELIABILITY_ADDITIONAL-BASIC_DIGEST",
+              "IMAGEN-IMGN_FU_RELIABILITY-BASIC_DIGEST",
+              "IMAGEN-IMGN_KIRBY_FU_RC5-IMAGEN_KIRBY_DIGEST",
+              "IMAGEN-IMGN_TLFB_FU_RC5-BASIC_DIGEST",
+              # FU2
+              "IMAGEN-IMGN_GATEWAY_FU2_2-BASIC_DIGEST",
+              "IMAGEN-IMGN_RELIABILITY_CORE_CHILD_FU2-BASIC_DIGEST",
+              "IMAGEN-IMGN_RELIABILITY_OPT_FU2-BASIC_DIGEST",
+              "IMAGEN-IMGN_RELIABILITY_PI_FU2-BASIC_DIGEST",
+              "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST")
 
 
 derivation <- function(name) {
     switch(name,
+           "IMAGEN-IMGN_KIRBY_RC5-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
+           "IMAGEN-IMGN_KIRBY_FU_RC5-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
+           "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
            rotateQuestionnaire)  # default fits all other questionnaires
 }
 
 
-# Iterate over exported CSV Psytools files
-for (filename in list.files(PSYTOOLS_PSC2_DIR)) {
-    # The name of the questionnaire is based on the CSV file name
-    name <- file_path_sans_ext(filename)
+process <- function(psc2_dir, processed_dir) {
+    # Iterate over exported CSV Psytools files
+    for (filename in list.files(psc2_dir)) {
+        # The name of the questionnaire is based on the CSV file name
+        name <- file_path_sans_ext(filename)
 
-    # Read each exported CSV Psytools file into a data frame
-    filepath <- file.path(PSYTOOLS_PSC2_DIR, filename)
-    COL_CLASSES = c(
-        "User.code"="character",
-        "Block"="character",
-        "Trial"="character",
-        "Response.time..ms."="numeric")
-    df <- read.csv(filepath, colClasses=COL_CLASSES)
+        print(name)
+        if (name %in% BOGUS) {
+            next
+        }
 
-    # Discard uncomplete trials
-    df <- subset(df, df$Completed=='t')
-    # Get rid of TEST, THOMAS_PRONK and MAREN user codes (PSC1-only)
-    df <- subset(df, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case=TRUE))
+        # Read each exported CSV Psytools file into a data frame
+        filepath <- file.path(psc2_dir, filename)
+        COL_CLASSES = c(
+            "User.code"="character",
+            "Block"="character",
+            "Trial"="character",
+            "Response.time..ms."="numeric")
+        df <- read.csv(filepath, colClasses=COL_CLASSES)
 
-    # Add an index to preserve order (to simplify eyeballing)
-    df$rowIndex <- seq_len(nrow(df))
+        # Discard uncomplete trials
+        df <- subset(df, df$Completed=='t')
+        # Get rid of TEST, THOMAS_PRONK and MAREN user codes (PSC1-only)
+        df <- subset(df, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case=TRUE))
 
-    # Apply relevant derivation function to each questionnaire
-    derivation_function <- derivation(name)
-    df <- derivation_function(df)
+        # Add an index to preserve order (to simplify eyeballing)
+        df$rowIndex <- seq_len(nrow(df))
 
-    # Write data frame back to the processed CSV file
-    filepath <- file.path(PSYTOOLS_PROCESSED_DIR, filename)
-    columns <- sub("\\.ms\\.", "[ms]", colnames(df))  # Response time [ms]
-    columns <- gsub("\\.", " ", columns)
-    write.table(df, filepath, quote=FALSE, sep=",", na="",
-                row.names=FALSE, col.names=columns)
+        # Apply relevant derivation function to each questionnaire
+        derivation_function <- derivation(name)
+        df <- derivation_function(df)
+
+        # Write data frame back to the processed CSV file
+        filepath <- file.path(processed_dir, filename)
+        columns <- sub("\\.ms\\.", "[ms]", colnames(df))  # Response time [ms]
+        columns <- gsub("\\.", " ", columns)
+        write.table(df, filepath, quote=FALSE, sep=",", na="",
+                    row.names=FALSE, col.names=columns)
+    }
 }
+
+
+process(PSYTOOLS_BL_PSC2_DIR, PSYTOOLS_BL_PROCESSED_DIR)
+process(PSYTOOLS_FU1_PSC2_DIR, PSYTOOLS_FU1_PROCESSED_DIR)
+process(PSYTOOLS_FU2_PSC2_DIR, PSYTOOLS_FU2_PROCESSED_DIR)
