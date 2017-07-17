@@ -64,6 +64,17 @@ derivation <- function(name) {
 }
 
 
+quote <- function(x) {
+    if (class(x) == "character") {
+        # Escape double quotation marks by doubling them
+        x <- gsub('"', '""', x)
+        # Enclose in quotation marks strings with commas or quotation marks
+        x <- gsub('^(.*[",].*$)', '"\\1"', x)
+    }
+    return (x)
+}
+
+
 process <- function(psc2_dir, processed_dir) {
     # Iterate over exported CSV Psytools files
     for (filename in list.files(psc2_dir)) {
@@ -94,6 +105,11 @@ process <- function(psc2_dir, processed_dir) {
         # Apply relevant derivation function to each questionnaire
         derivation_function <- derivation(name)
         df <- derivation_function(df)
+
+        # Roll our own quoting method
+        for (column in colnames(df)) {
+            df[,column] <- quote(df[,column])
+        }
 
         # Write data frame back to the processed CSV file
         filepath <- file.path(processed_dir, filename)
