@@ -56,11 +56,11 @@ BOGUS <- list(# BL
 
 
 derivation <- function(name) {
-    switch(name,
-           "IMAGEN-IMGN_KIRBY_RC5-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
-           "IMAGEN-IMGN_KIRBY_FU_RC5-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
-           "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
-           rotateQuestionnaire)  # default fits all other questionnaires
+    return (switch(name,
+                   "IMAGEN-IMGN_KIRBY_RC5-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
+                   "IMAGEN-IMGN_KIRBY_FU_RC5-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
+                   "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
+                   rotateQuestionnaire))  # default fits all other questionnaires
 }
 
 
@@ -92,7 +92,7 @@ process <- function(psc2_dir, processed_dir) {
             "Block"="character",
             "Trial"="character",
             "Response.time..ms."="numeric")
-        df <- read.csv(filepath, colClasses=COL_CLASSES)
+        df <- read.csv(filepath, colClasses=COL_CLASSES, stringsAsFactors=FALSE)
 
         # Discard uncomplete trials
         df <- subset(df, df$Completed=='t')
