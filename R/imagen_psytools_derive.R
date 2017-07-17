@@ -115,7 +115,7 @@ process <- function(psc2_dir, processed_dir) {
         filepath <- file.path(processed_dir, filename)
         columns <- sub("\\.ms\\.", "[ms]", colnames(df))  # Response time [ms]
         columns <- gsub("\\.", " ", columns)
-        write.table(df, filepath, sep=",", na="",
+        write.table(df, filepath, quote=FALSE, sep=",", na="",
                     row.names=FALSE, col.names=columns)
     }
 }
