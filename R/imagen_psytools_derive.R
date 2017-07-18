@@ -55,7 +55,7 @@ BOGUS <- list(# BL
               "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST")
 
 
-quote <- function(x) {
+escape <- function(x) {
     if (class(x) == "character") {
         # Escape double quotation marks by doubling them
         x <- gsub('"', '""', x)
@@ -104,7 +104,7 @@ process <- function(psc2_dir, processed_dir) {
 
         # Roll our own quoting method
         for (column in colnames(df)) {
-            df[,column] <- quote(df[,column])
+            df[,column] <- escape(df[,column])
         }
 
         # Write data frame back to the processed CSV file
