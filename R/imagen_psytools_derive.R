@@ -55,15 +55,6 @@ BOGUS <- list(# BL
               "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST")
 
 
-derivation <- function(name) {
-    return (switch(name,
-                   "IMAGEN-IMGN_KIRBY_RC5-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
-                   "IMAGEN-IMGN_KIRBY_FU_RC5-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
-                   "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST"=deriveKIRBY,
-                   rotateQuestionnaire))  # default fits all other questionnaires
-}
-
-
 quote <- function(x) {
     if (class(x) == "character") {
         # Escape double quotation marks by doubling them
@@ -103,8 +94,13 @@ process <- function(psc2_dir, processed_dir) {
         df$rowIndex <- seq_len(nrow(df))
 
         # Apply relevant derivation function to each questionnaire
-        derivation_function <- derivation(name)
-        df <- derivation_function(df)
+        if (name == "IMAGEN-IMGN_KIRBY_RC5-IMAGEN_KIRBY_DIGEST" ||
+                name == "IMAGEN-IMGN_KIRBY_FU_RC5-IMAGEN_KIRBY_DIGEST" ||
+                name == "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST") {
+            df <- deriveKIRBY(df)
+        } else {
+            df <- rotateQuestionnaire(df)
+        }
 
         # Roll our own quoting method
         for (column in colnames(df)) {
