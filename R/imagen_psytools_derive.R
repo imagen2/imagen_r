@@ -81,8 +81,7 @@ process <- function(psc2_dir, processed_dir) {
         COL_CLASSES = c(
             "User.code"="character",
             "Block"="character",
-            "Trial"="character",
-            "Response.time..ms."="numeric")
+            "Trial"="character")
         df <- read.csv(filepath, colClasses=COL_CLASSES, stringsAsFactors=FALSE)
 
         # Discard uncomplete trials
