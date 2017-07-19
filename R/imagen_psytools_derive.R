@@ -85,7 +85,7 @@ process <- function(psc2_dir, processed_dir) {
         df <- read.csv(filepath, colClasses=COL_CLASSES, stringsAsFactors=FALSE)
 
         # Discard uncomplete trials
-        df <- subset(df, df$Completed=='t')
+        df <- subset(df, Completed=='t')
         # Get rid of TEST, THOMAS_PRONK and MAREN user codes (PSC1-only)
         df <- subset(df, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case=TRUE))
 
