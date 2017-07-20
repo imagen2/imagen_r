@@ -82,35 +82,35 @@ process <- function(psc2_dir, processed_dir) {
             "User.code"="character",
             "Block"="character",
             "Trial"="character")
-        df <- read.csv(filepath, colClasses=COL_CLASSES, stringsAsFactors=FALSE)
+        d <- read.csv(filepath, colClasses=COL_CLASSES, stringsAsFactors=FALSE)
 
         # Discard uncomplete trials
-        df <- subset(df, Completed=='t')
+        d <- subset(d, Completed=='t')
         # Get rid of TEST, THOMAS_PRONK and MAREN user codes (PSC1-only)
-        df <- subset(df, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case=TRUE))
+        d <- subset(d, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case=TRUE))
 
         # Add an index to preserve order (to simplify eyeballing)
-        df$rowIndex <- seq_len(nrow(df))
+        d$rowIndex <- seq_len(nrow(d))
 
         # Apply relevant derivation function to each questionnaire
         if (name == "IMAGEN-IMGN_KIRBY_RC5-IMAGEN_KIRBY_DIGEST" ||
                 name == "IMAGEN-IMGN_KIRBY_FU_RC5-IMAGEN_KIRBY_DIGEST" ||
                 name == "IMAGEN-IMGN_KIRBY_FU2-IMAGEN_KIRBY_DIGEST") {
-            df <- deriveKIRBY(df)
+            d <- deriveKIRBY(d)
         } else {
-            df <- rotateQuestionnaire(df)
+            d <- rotateQuestionnaire(d)
         }
 
         # Roll our own quoting method
-        for (column in colnames(df)) {
-            df[,column] <- escape(df[,column])
+        for (column in colnames(d)) {
+            d[,column] <- escape(d[,column])
         }
 
         # Write data frame back to the processed CSV file
         filepath <- file.path(processed_dir, filename)
-        columns <- sub("\\.ms\\.", "[ms]", colnames(df))  # Response time [ms]
+        columns <- sub("\\.ms\\.", "[ms]", colnames(d))  # Response time [ms]
         columns <- gsub("\\.", " ", columns)
-        write.table(df, filepath, quote=FALSE, sep=",", na="",
+        write.table(d, filepath, quote=FALSE, sep=",", na="",
                     row.names=FALSE, col.names=columns)
     }
 }
