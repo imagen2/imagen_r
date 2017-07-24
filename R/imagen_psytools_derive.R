@@ -33,11 +33,13 @@ library(Psytools)
 
 
 PSYTOOLS_BL_PSC2_DIR <- "/neurospin/imagen/BL/RAW/PSC1/psytools"
-PSYTOOLS_BL_PROCESSED_DIR <- "/home/dp165978/WORK_IN_PROGRESS/imagen/PSYTOOLS/R/BL"
+PSYTOOLS_BL_PROCESSED_DIR <- "/neurospin/imagen/BL/processed/psytools"
 PSYTOOLS_FU1_PSC2_DIR <- "/neurospin/imagen/FU1/RAW/PSC1/psytools"
-PSYTOOLS_FU1_PROCESSED_DIR <- "/home/dp165978/WORK_IN_PROGRESS/imagen/PSYTOOLS/R/FU1"
+PSYTOOLS_FU1_PROCESSED_DIR <- "/neurospin/imagen/FU1/processed/psytools"
 PSYTOOLS_FU2_PSC2_DIR <- "/neurospin/imagen/FU2/RAW/PSC1/psytools"
-PSYTOOLS_FU2_PROCESSED_DIR <- "/home/dp165978/WORK_IN_PROGRESS/imagen/PSYTOOLS/R/FU2"
+PSYTOOLS_FU2_PROCESSED_DIR <- "/neurospin/imagen/FU2/processed/psytools"
+PSYTOOLS_FU3_PSC2_DIR <- "/neurospin/imagen/FU2/RAW/PSC1/psytools"
+PSYTOOLS_FU3_PROCESSED_DIR <- "/neurospin/imagen/FU2/processed/psytools"
 
 BOGUS <- list(# BL
               "IMAGEN-IMGN_CTS_PARENT_RC5-BASIC_DIGEST",
@@ -70,6 +72,9 @@ process <- function(psc2_dir, processed_dir) {
     # Iterate over exported CSV Psytools files
     for (filename in list.files(psc2_dir)) {
         # The name of the questionnaire is based on the CSV file name
+        if (file_ext(filename) != "csv") {
+            next
+        }
         name <- file_path_sans_ext(filename)
 
         if (name %in% BOGUS) {
@@ -120,3 +125,4 @@ process <- function(psc2_dir, processed_dir) {
 process(PSYTOOLS_BL_PSC2_DIR, PSYTOOLS_BL_PROCESSED_DIR)
 process(PSYTOOLS_FU1_PSC2_DIR, PSYTOOLS_FU1_PROCESSED_DIR)
 process(PSYTOOLS_FU2_PSC2_DIR, PSYTOOLS_FU2_PROCESSED_DIR)
+process(PSYTOOLS_FU3_PSC2_DIR, PSYTOOLS_FU3_PROCESSED_DIR)
