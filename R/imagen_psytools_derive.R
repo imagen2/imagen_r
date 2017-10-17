@@ -32,14 +32,14 @@ library(tools)
 library(Psytools)
 
 
-PSYTOOLS_BL_PSC2_DIR <- "/neurospin/imagen/BL/RAW/PSC1/psytools"
+PSYTOOLS_BL_PSC2_DIR <- "/neurospin/imagen/BL/RAW/PSC2/psytools"
 PSYTOOLS_BL_PROCESSED_DIR <- "/neurospin/imagen/BL/processed/psytools"
-PSYTOOLS_FU1_PSC2_DIR <- "/neurospin/imagen/FU1/RAW/PSC1/psytools"
+PSYTOOLS_FU1_PSC2_DIR <- "/neurospin/imagen/FU1/RAW/PSC2/psytools"
 PSYTOOLS_FU1_PROCESSED_DIR <- "/neurospin/imagen/FU1/processed/psytools"
-PSYTOOLS_FU2_PSC2_DIR <- "/neurospin/imagen/FU2/RAW/PSC1/psytools"
+PSYTOOLS_FU2_PSC2_DIR <- "/neurospin/imagen/FU2/RAW/PSC2/psytools"
 PSYTOOLS_FU2_PROCESSED_DIR <- "/neurospin/imagen/FU2/processed/psytools"
-PSYTOOLS_FU3_PSC2_DIR <- "/neurospin/imagen/FU2/RAW/PSC1/psytools"
-PSYTOOLS_FU3_PROCESSED_DIR <- "/neurospin/imagen/FU2/processed/psytools"
+PSYTOOLS_FU3_PSC2_DIR <- "/neurospin/imagen/FU3/RAW/PSC2/psytools"
+PSYTOOLS_FU3_PROCESSED_DIR <- "/neurospin/imagen/FU3/processed/psytools"
 
 BOGUS <- list(# BL
               "IMAGEN-IMGN_CTS_PARENT_RC5-BASIC_DIGEST",
@@ -48,7 +48,7 @@ BOGUS <- list(# BL
               "IMAGEN-IMGN_FU_RELIABILITY_ADDITIONAL-BASIC_DIGEST",
               "IMAGEN-IMGN_FU_RELIABILITY-BASIC_DIGEST",
               "IMAGEN-IMGN_KIRBY_FU_RC5-IMAGEN_KIRBY_DIGEST",
-              "IMAGEN-IMGN_TLFB_FU_RC5-BASIC_DIGEST",
+              "IMAGEN-IMGN_TLFB_FU_RC5-BASIC_DIGEST", # empty file, no TLFB in FU1
               # FU2
               "IMAGEN-IMGN_GATEWAY_FU2_2-BASIC_DIGEST",
               "IMAGEN-IMGN_RELIABILITY_CORE_CHILD_FU2-BASIC_DIGEST",
@@ -77,6 +77,15 @@ process <- function(psc2_dir, processed_dir) {
         }
         name <- file_path_sans_ext(filename)
 
+        # Only process CSV exports from the legacy Psytools system.
+        # The new LimeSurvey system natively exports CSV in wide format.
+        if (substring(filename, 1, nchar("IMAGEN-IMGN_")) != "IMAGEN-IMGN_") {
+            next
+        }
+
+        # Delosis might need to fix derivation functions.
+        # They cannot proces these files.
+        print(filename)
         if (name %in% BOGUS) {
             next
         }
