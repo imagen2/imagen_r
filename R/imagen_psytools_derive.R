@@ -121,6 +121,9 @@ process <- function(psc2_dir, processed_dir) {
             d[,column] <- escape(d[,column])
         }
 
+        # Typo in the ADRS questionnaire name, all the way from the Delosis server
+        filename <- gsub("_ADSR_", "_ADRS_", filename)
+
         # Write data frame back to the processed CSV file
         filepath <- file.path(processed_dir, filename)
         columns <- sub("\\.ms\\.", "[ms]", colnames(d))  # Response time [ms]
