@@ -130,6 +130,10 @@ process <- function(psc2_dir, processed_dir) {
         columns <- gsub("\\.", " ", columns)
         write.table(d, filepath, quote=FALSE, sep=",", na="",
                     row.names=FALSE, col.names=columns)
+
+        # Try to avoid out-of-memory condition
+        rm(d)
+        gc()
     }
 }
 
