@@ -72,9 +72,6 @@ process <- function(psc2_dir, processed_dir) {
     # Iterate over exported CSV Psytools files
     for (filename in list.files(psc2_dir)) {
         # The name of the questionnaire is based on the CSV file name
-        if (file_ext(filename) != "csv") {
-            next
-        }
         name <- file_path_sans_ext(filename)
 
         # Only process CSV exports from the legacy Psytools system.
@@ -103,6 +100,12 @@ process <- function(psc2_dir, processed_dir) {
         d <- subset(d, Completed=='t')
         # Get rid of TEST, THOMAS_PRONK and MAREN user codes (PSC1-only)
         d <- subset(d, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case=TRUE))
+
+        # Skip files without data - they cannot be rotated!
+        if (nrow(d) < 2) {
+            cat(name, ": skipping file without data.", sep="", fill=TRUE)
+            next
+        }
 
         # Add an index to preserve order (to simplify eyeballing)
         d$rowIndex <- seq_len(nrow(d))
