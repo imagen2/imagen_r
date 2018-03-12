@@ -145,7 +145,7 @@ process <- function(psc2_dir, processed_dir) {
 			d <- selectIteration(d, max, TRUE, FALSE)
 			d <- deriveImgnReliability(d)
 			# Normalize task title name
-			filename <- sub("_FU_RELIABILITY_([^-]*)-", "_RELIABILITY_\\1_FU-", filename)
+			filename <- sub("_FU_RELIABILITY((_[^-]*)?)-", "_RELIABILITY\\1_FU-", filename)
 		}
 		else if (grepl("^IMAGEN-IMGN_GEN", filename)) {
 			# Select the last complete attempt for Gen
