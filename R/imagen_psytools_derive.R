@@ -236,14 +236,7 @@ process <- function(psc2_dir, processed_dir) {
 			selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnDOTPROBE(d)
 		}
-		else if (grepl("^IMAGEN-IMGN_AUDIT_PARENT_", filename) ||
-		         grepl("^IMAGEN-IMGN_ESPAD_PARENT", filename) ||
-		         grepl("^IMAGEN-IMGN_LEQ_RC5", filename) || # BL only!
-		         grepl("^IMAGEN-IMGN_NI_DATA_RC5", filename) || # BL only!
-		         grepl("^IMAGEN-IMGN_PBQ", filename) ||
-		         grepl("^IMAGEN-IMGN_TLFB_RC5", filename) || grepl("^IMAGEN-IMGN_TLFB_FU_", filename) || # BL/FU1 only!
-		         grepl("^IMAGEN-IMGN_GATEWAY", filename) ||
-		         grepl("^IMAGEN-cVEDA_MINI5", filename)) {
+		else if (grepl("-BASIC_DIGEST.csv$", filename)) {
 			selectIteration(d, min, TRUE, FALSE)
 			d <- rotateQuestionnaire(d)
 		}
