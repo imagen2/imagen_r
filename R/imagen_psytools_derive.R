@@ -144,6 +144,8 @@ process <- function(psc2_dir, processed_dir) {
 		if (grepl("^IMAGEN-IMGN_RELIABILITY", filename) || grepl("^IMAGEN-IMGN_FU_RELIABILITY", filename)) {
 			d <- selectIteration(d, max, TRUE, FALSE)
 			d <- deriveImgnReliability(d)
+			# Normalize task title name
+			filename <- sub("_FU_RELIABILITY_([^-]*)-", "_RELIABILITY_\\1_FU-", filename)
 		}
 		else if (grepl("^IMAGEN-IMGN_GEN", filename)) {
 			# Select the last complete attempt for Gen
@@ -154,7 +156,7 @@ process <- function(psc2_dir, processed_dir) {
 			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnADRS(d)
 			# Typo in the ADRS task title name on the Delosis server
-			filename <- gsub("_ADSR_", "_ADRS_", filename)
+			filename <- sub("_ADSR_", "_ADRS_", filename)
 		}
 		else if (grepl("^IMAGEN-IMGN_TCI_PARENT", filename)) {
 			selectIteration(d, min, TRUE, FALSE)
