@@ -30,6 +30,7 @@
 
 library(tools)
 library(Psytools)
+library(stringr)  # str_locate
 
 
 PSYTOOLS_BL_PSC2_DIR <- "/neurospin/imagen/BL/RAW/PSC2/psytools"
@@ -40,6 +41,8 @@ PSYTOOLS_FU2_PSC2_DIR <- "/neurospin/imagen/FU2/RAW/PSC2/psytools"
 PSYTOOLS_FU2_PROCESSED_DIR <- "/neurospin/imagen/FU2/processed/psytools"
 PSYTOOLS_FU3_PSC2_DIR <- "/neurospin/imagen/FU3/RAW/PSC2/psytools"
 PSYTOOLS_FU3_PROCESSED_DIR <- "/neurospin/imagen/FU3/processed/psytools"
+PSYTOOLS_SB_PSC2_DIR <- "/neurospin/imagen/SB/RAW/PSC2/psytools"
+PSYTOOLS_SB_PROCESSED_DIR <- "/neurospin/imagen/SB/processed/psytools"
 
 escape <- function(x) {
 	if (class(x) == "character") {
@@ -95,16 +98,17 @@ process <- function(psc2_dir, processed_dir) {
 
 	# Only process CSV exports from the legacy Psytools system.
 	# The new LimeSurvey system natively exports CSV in wide format.
-	filenames <- filenames[grepl("^IMAGEN-", filenames)]
+	filenames <- filenames[grepl("^(IMAGEN|STRATIFY)-", filenames)]
 
 	# split between PALP and other files
-	palp_filenames <- split(filenames, grepl("^IMAGEN-IMGN_PALP_", filenames))
+	palp_filenames <- split(filenames, grepl("-IMGN_PALP_", filenames))
 
 	# concatenate PALP files
 	palp <- palp_filenames$'TRUE'
 	if (length(palp)) {
+		# expect 1_1, 1_2, 1_3, etc. right after "-IMGN_PALP_"
+		p <- str_locate(palp, "-IMGN_PALP_")[,2] + 1
 		# order PALP files in lexicographical order: 1_1, 1_2, 1_3, 2_1, 2_2, 2_3
-		p <- nchar("IMAGEN-IMGN_PALP_") + 1
 		palp <- palp[order(substr(palp, p, p + 2))]
 		# read the first PALP file...
 		filepath <- file.path(psc2_dir, palp[1])
@@ -259,3 +263,4 @@ process(PSYTOOLS_BL_PSC2_DIR, PSYTOOLS_BL_PROCESSED_DIR)
 process(PSYTOOLS_FU1_PSC2_DIR, PSYTOOLS_FU1_PROCESSED_DIR)
 process(PSYTOOLS_FU2_PSC2_DIR, PSYTOOLS_FU2_PROCESSED_DIR)
 process(PSYTOOLS_FU3_PSC2_DIR, PSYTOOLS_FU3_PROCESSED_DIR)
+process(PSYTOOLS_SB_PSC2_DIR, PSYTOOLS_SB_PROCESSED_DIR)
