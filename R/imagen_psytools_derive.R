@@ -163,89 +163,89 @@ process <- function(psc2_dir, processed_dir) {
 			filename <- sub("_ADSR_", "_ADRS_", filename)
 		}
 		else if (grepl("^IMAGEN-IMGN_TCI_PARENT", filename)) {
-			selectIteration(d, min, TRUE, FALSE)
+			d <- selectIteration(d, min, TRUE, FALSE)
 			d <- deriveImgnTCI(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_TCI_CHILD", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnTCI(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_NEO_FFI_PARENT", filename)) {
-			selectIteration(d, min, TRUE, FALSE)
+			d <- selectIteration(d, min, TRUE, FALSE)
 			d <- deriveImgnNEO(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_NEO_FFI", filename)) { # CHILD
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnNEO(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_SURPS_PARENT", filename)) {
-			selectIteration(d, min, TRUE, FALSE)
+			d <- selectIteration(d, min, TRUE, FALSE)
 			d <- deriveImgnSURPS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_SURPS", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnSURPS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_MAST_PARENT", filename)) {
-			selectIteration(d, min, TRUE, FALSE)
+			d <- selectIteration(d, min, TRUE, FALSE)
 			d <- deriveImgnMAST(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_MAST_CHILD", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnMAST(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_CSI_CHILD", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnCIS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_IRI_CHILD", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnIRI(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_AUDIT_CHILD", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnAUDIT(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_AUDIT_INTERVIEW", filename)) {
 			# Select the last complete attempt for Interview
-			selectIteration(d, max, TRUE, TRUE)
+			d <- selectIteration(d, max, TRUE, TRUE)
 			d <- deriveImgnAUDIT(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_ESPAD_CHILD", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnESPAD(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_ESPAD_INTERVIEW", filename)) {
 			# Select the last complete attempt for Interview
-			selectIteration(d, max, TRUE, TRUE)
+			d <- selectIteration(d, max, TRUE, TRUE)
 			d <- deriveImgnESPAD(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_PDS", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnPDS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_CTS_PARENT", filename)) {
-			selectIteration(d, min, TRUE, FALSE)
+			d <- selectIteration(d, min, TRUE, FALSE)
 			d <- deriveImgnCTS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_IDENT", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnIDENT(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_KIRBY", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveKIRBY(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_DOT_PROBE", filename)) {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnDOTPROBE(d)
 		}
 		else if (grepl("-BASIC_DIGEST.csv$", filename)) {
-			selectIteration(d, min, TRUE, FALSE)
+			d <- selectIteration(d, min, TRUE, FALSE)
 			d <- rotateQuestionnaire(d)
 		}
 		else {
-			selectIteration(d, min, TRUE, TRUE)
+			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- rotateQuestionnaire(d)
 		}
 
