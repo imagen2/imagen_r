@@ -240,6 +240,10 @@ process <- function(psc2_dir, processed_dir) {
 			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImgnDOTPROBE(d)
 		}
+		else if (grepl("LEQ", filename)) {
+			d <- selectIteration(d, min, TRUE, TRUE)
+			d <- deriveLEQ(d)
+		}
 		else if (grepl("-BASIC_DIGEST.csv$", filename)) {
 			d <- selectIteration(d, min, TRUE, FALSE)
 			d <- rotateQuestionnaire(d)
