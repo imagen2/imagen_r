@@ -148,90 +148,90 @@ process <- function(psc2_dir, processed_dir) {
 
 		if (grepl("^IMAGEN-IMGN_RELIABILITY", filename) || grepl("^IMAGEN-IMGN_FU_RELIABILITY", filename)) {
 			d <- selectIteration(d, max, TRUE, FALSE)
-			d <- deriveImgnReliability(d)
+			d <- deriveImagenReliability(d)
 			# Normalize task title name
 			filename <- sub("_FU_RELIABILITY((_[^-]*)?)-", "_RELIABILITY\\1_FU-", filename)
 		}
 		else if (grepl("^IMAGEN-IMGN_GEN", filename)) {
 			# Select the last complete attempt for Gen
 			d <- selectIteration(d, max, TRUE, FALSE)
-			d <- deriveImgnGEN(d)
+			d <- deriveImagenGEN(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_ADSR", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnADRS(d)
+			d <- deriveImagenADRS(d)
 			# Typo in the ADRS task title name on the Delosis server
 			filename <- sub("_ADSR_", "_ADRS_", filename)
 		}
 		else if (grepl("^IMAGEN-IMGN_TCI_PARENT", filename)) {
 			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImgnTCI(d)
+			d <- deriveImagenTCI(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_TCI_CHILD", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnTCI(d)
+			d <- deriveImagenTCI(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_NEO_FFI_PARENT", filename)) {
 			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImgnNEO(d)
+			d <- deriveImagenNEO(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_NEO_FFI", filename)) { # CHILD
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnNEO(d)
+			d <- deriveImagenNEO(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_SURPS_PARENT", filename)) {
 			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImgnSURPS(d)
+			d <- deriveSURPS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_SURPS", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnSURPS(d)
+			d <- deriveSURPS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_MAST_PARENT", filename)) {
 			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImgnMAST(d)
+			d <- deriveImagenMAST(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_MAST_CHILD", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnMAST(d)
+			d <- deriveImagenMAST(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_CSI_CHILD", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnCIS(d)
+			d <- deriveImagenCIS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_IRI_CHILD", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnIRI(d)
+			d <- deriveImagenIRI(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_AUDIT_CHILD", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnAUDIT(d)
+			d <- deriveImagenAUDIT(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_AUDIT_INTERVIEW", filename)) {
 			# Select the last complete attempt for Interview
 			d <- selectIteration(d, max, TRUE, TRUE)
-			d <- deriveImgnAUDIT(d)
+			d <- deriveImagenAUDIT(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_ESPAD_CHILD", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnESPAD(d)
+			d <- deriveImagenESPAD(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_ESPAD_INTERVIEW", filename)) {
 			# Select the last complete attempt for Interview
 			d <- selectIteration(d, max, TRUE, TRUE)
-			d <- deriveImgnESPAD(d)
+			d <- deriveImagenESPAD(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_PDS", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnPDS(d)
+			d <- deriveImagenPDS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_CTS_PARENT", filename)) {
 			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImgnCTS(d)
+			d <- deriveImagenCTS(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_IDENT", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnIDENT(d)
+			d <- deriveImagenIDENT(d)
 		}
 		else if (grepl("^IMAGEN-IMGN_KIRBY", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
@@ -239,7 +239,7 @@ process <- function(psc2_dir, processed_dir) {
 		}
 		else if (grepl("^IMAGEN-IMGN_DOT_PROBE", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImgnDOTPROBE(d)
+			d <- deriveImagenDOTPROBE(d)
 		}
 		else if (grepl("LEQ", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
