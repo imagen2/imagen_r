@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# Copyright (c) 2017-2018 CEA
+# Copyright (c) 2017-2019 CEA
 #
 # This software is governed by the CeCILL license under French law and
 # abiding by the rules of distribution of free software. You can use,
@@ -33,16 +33,17 @@ library(Psytools)
 library(stringr)  # str_locate
 
 
-PSYTOOLS_BL_PSC2_DIR <- "/neurospin/imagen/BL/RAW/PSC2/psytools"
-PSYTOOLS_BL_PROCESSED_DIR <- "/neurospin/imagen/BL/processed/psytools"
-PSYTOOLS_FU1_PSC2_DIR <- "/neurospin/imagen/FU1/RAW/PSC2/psytools"
-PSYTOOLS_FU1_PROCESSED_DIR <- "/neurospin/imagen/FU1/processed/psytools"
-PSYTOOLS_FU2_PSC2_DIR <- "/neurospin/imagen/FU2/RAW/PSC2/psytools"
-PSYTOOLS_FU2_PROCESSED_DIR <- "/neurospin/imagen/FU2/processed/psytools"
-PSYTOOLS_FU3_PSC2_DIR <- "/neurospin/imagen/FU3/RAW/PSC2/psytools"
-PSYTOOLS_FU3_PROCESSED_DIR <- "/neurospin/imagen/FU3/processed/psytools"
-PSYTOOLS_SB_PSC2_DIR <- "/neurospin/imagen/STRATIFY/RAW/PSC2/psytools"
-PSYTOOLS_SB_PROCESSED_DIR <- "/neurospin/imagen/STRATIFY/processed/psytools"
+PSYTOOLS_BL_PSC1_DIR <- "/neurospin/imagen/BL/RAW/PSC1/psytools"
+PSYTOOLS_BL_DERIVED_DIR <- "/tmp/imagen/BL/processed/psytools"
+PSYTOOLS_FU1_PSC1_DIR <- "/neurospin/imagen/FU1/RAW/PSC1/psytools"
+PSYTOOLS_FU1_DERIVED_DIR <- "/tmp/imagen/FU1/processed/psytools"
+PSYTOOLS_FU2_PSC1_DIR <- "/neurospin/imagen/FU2/RAW/PSC1/psytools"
+PSYTOOLS_FU2_DERIVED_DIR <- "/tmp/imagen/FU2/processed/psytools"
+PSYTOOLS_FU3_PSC1_DIR <- "/neurospin/imagen/FU3/RAW/PSC1/psytools"
+PSYTOOLS_FU3_DERIVED_DIR <- "/tmp/imagen/FU3/processed/psytools"
+PSYTOOLS_SB_PSC1_DIR <- "/neurospin/imagen/STRATIFY/RAW/PSC1/psytools"
+PSYTOOLS_SB_DERIVED_DIR <- "/tmp/imagen/STRATIFY/processed/psytools"
+
 
 escape <- function(x) {
 	if (class(x) == "character") {
@@ -263,8 +264,8 @@ process <- function(psc2_dir, processed_dir) {
 }
 
 
-process(PSYTOOLS_BL_PSC2_DIR, PSYTOOLS_BL_PROCESSED_DIR)
-process(PSYTOOLS_FU1_PSC2_DIR, PSYTOOLS_FU1_PROCESSED_DIR)
-process(PSYTOOLS_FU2_PSC2_DIR, PSYTOOLS_FU2_PROCESSED_DIR)
-process(PSYTOOLS_FU3_PSC2_DIR, PSYTOOLS_FU3_PROCESSED_DIR)
-process(PSYTOOLS_SB_PSC2_DIR, PSYTOOLS_SB_PROCESSED_DIR)
+process(PSYTOOLS_BL_PSC1_DIR, PSYTOOLS_BL_DERIVED_DIR)
+process(PSYTOOLS_FU1_PSC1_DIR, PSYTOOLS_FU1_DERIVED_DIR)
+process(PSYTOOLS_FU2_PSC1_DIR, PSYTOOLS_FU2_DERIVED_DIR)
+process(PSYTOOLS_FU3_PSC1_DIR, PSYTOOLS_FU3_DERIVED_DIR)
+process(PSYTOOLS_SB_PSC1_DIR, PSYTOOLS_SB_DERIVED_DIR)
