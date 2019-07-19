@@ -241,8 +241,12 @@ process <- function(psc2_dir, processed_dir) {
 			d <- selectIteration(d, min, TRUE, TRUE)
 			d <- deriveImagenDOTPROBE(d)
 		}
-		else if (grepl("LEQ", filename)) {
+		else if (grepl("LEQ_FU", filename)) {
 			d <- selectIteration(d, min, TRUE, TRUE)
+			d <- deriveLEQ(d)
+		}
+		else if (grepl("LEQ", filename)) {
+			d <- selectIteration(d, min, TRUE, FALSE)
 			d <- deriveLEQ(d)
 		}
 		else if (grepl("-BASIC_DIGEST.csv$", filename)) {
