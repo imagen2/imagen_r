@@ -44,15 +44,14 @@ PSYTOOLS_FU3_DERIVED_DIR <- "/tmp/imagen/FU3/processed/psytools"
 PSYTOOLS_SB_PSC1_DIR <- "/neurospin/imagen/STRATIFY/RAW/PSC1/psytools"
 PSYTOOLS_SB_DERIVED_DIR <- "/tmp/imagen/STRATIFY/processed/psytools"
 
-
 escape <- function(x) {
-	if (class(x) == "character") {
-		# Escape double quotation marks by doubling them
-		x <- gsub('"', '""', x)
-		# Enclose in quotation marks strings with commas or quotation marks
-		x <- gsub('^(.*[",].*$)', '"\\1"', x)
-	}
-	return (x)
+  if ("character" %in% class(x)) {
+    # Escape double quotation marks by doubling them
+    x <- gsub('"', '""', x)
+    # Enclose in quotation marks strings with commas or quotation marks
+    x <- gsub('^(.*[",\\;].*$)', '"\\1"', x)
+  }
+  return (x)
 }
 
 
@@ -94,179 +93,182 @@ write_psytools_csv <- function(d, file) {
 }
 
 
-process <- function(psc2_dir, processed_dir) {
-	filenames <- list.files(psc2_dir)
-
-	# Only process CSV exports from the legacy Psytools system.
-	# The new LimeSurvey system natively exports CSV in wide format.
-	filenames <- filenames[grepl("^(IMAGEN|STRATIFY)-", filenames)]
-
-	# split between PALP and other files
-	palp_filenames <- split(filenames, grepl("-IMGN_PALP_", filenames))
-
-	# concatenate PALP files
-	palp <- palp_filenames$'TRUE'
-	if (length(palp)) {
-		# expect 1_1, 1_2, 1_3, etc. right after "-IMGN_PALP_"
-		p <- str_locate(palp, "-IMGN_PALP_")[,2] + 1
-		# order PALP files in lexicographical order: 1_1, 1_2, 1_3, 2_1, 2_2, 2_3
-		palp <- palp[order(substr(palp, p, p + 2))]
-		# read the first PALP file...
-		filepath <- file.path(psc2_dir, palp[1])
-		d <- selectIteration(read_psytools_csv(filepath))
-		# ...then concatenate the remaining PALP files
-		for (filename in palp[-1]) {
-			filepath <- file.path(psc2_dir, filename)
-			d <- rbind(d, selectIteration(read_psytools_csv(filepath)))
-		}
-		d <- pre_process(d)
-		d <- derivePALP(d)
-
-		# Remove 1_1_
-		filename <- paste(substr(palp[1], 1, p - 2),
-		                  substr(palp[1], p + 3, nchar(palp[1])), sep = "")
-
-		filepath <- file.path(processed_dir, filename)
-		write_psytools_csv(d, filepath)
-
-		# avoid out-of-memory condition
-		rm(d)
-		gc()
-	}
-
-	# now iterate over non-PALP files
-	for (filename in palp_filenames$'FALSE') {
-		filepath <- file.path(psc2_dir, filename)
-		d <- read_psytools_csv(filepath)
-		d <- pre_process(d)
-
-		# Skip files without data - they cannot be rotated!
-		if (nrow(d) < 2) {
-			cat(filename, ": skipping file without data.", sep="", fill=TRUE)
-			next
-		}
-
-		if (grepl("^IMAGEN-IMGN_RELIABILITY", filename) || grepl("^IMAGEN-IMGN_FU_RELIABILITY", filename)) {
-			d <- selectIteration(d, max, TRUE, FALSE)
-			d <- deriveImagenReliability(d)
-			# Normalize task title name
-			filename <- sub("_FU_RELIABILITY((_[^-]*)?)-", "_RELIABILITY\\1_FU-", filename)
-		}
-		else if (grepl("^IMAGEN-IMGN_GEN", filename)) {
-			# Select the last complete attempt for Gen
-			d <- selectIteration(d, max, TRUE, FALSE)
-			d <- deriveImagenGEN(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_ADSR", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenADRS(d)
-			# Typo in the ADRS task title name on the Delosis server
-			filename <- sub("_ADSR_", "_ADRS_", filename)
-		}
-		else if (grepl("^IMAGEN-IMGN_TCI_PARENT", filename)) {
-			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImagenTCI(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_TCI_CHILD", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenTCI(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_NEO_FFI_PARENT", filename)) {
-			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImagenNEO(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_NEO_FFI", filename)) { # CHILD
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenNEO(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_SURPS_PARENT", filename)) {
-			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveSURPS(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_SURPS", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveSURPS(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_MAST_PARENT", filename)) {
-			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImagenMAST(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_MAST_CHILD", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenMAST(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_CSI_CHILD", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenCIS(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_IRI_CHILD", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenIRI(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_AUDIT_CHILD", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenAUDIT(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_AUDIT_INTERVIEW", filename)) {
-			# Select the last complete attempt for Interview
-			d <- selectIteration(d, max, TRUE, TRUE)
-			d <- deriveImagenAUDIT(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_ESPAD_CHILD", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenESPAD(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_ESPAD_INTERVIEW", filename)) {
-			# Select the last complete attempt for Interview
-			d <- selectIteration(d, max, TRUE, TRUE)
-			d <- deriveImagenESPAD(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_PDS", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenPDS(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_CTS_PARENT", filename)) {
-			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveImagenCTS(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_IDENT", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenIDENT(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_KIRBY", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveKIRBY(d)
-		}
-		else if (grepl("^IMAGEN-IMGN_DOT_PROBE", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveImagenDOTPROBE(d)
-		}
-		else if (grepl("LEQ_FU", filename)) {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- deriveLEQ(d)
-		}
-		else if (grepl("LEQ", filename)) {
-			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- deriveLEQ(d)
-		}
-		else if (grepl("-BASIC_DIGEST.csv$", filename)) {
-			d <- selectIteration(d, min, TRUE, FALSE)
-			d <- rotateQuestionnaire(d)
-		}
-		else {
-			d <- selectIteration(d, min, TRUE, TRUE)
-			d <- rotateQuestionnaire(d)
-		}
-
-		filepath <- file.path(processed_dir, filename)
-		write_psytools_csv(d, filepath)
-
-		# avoid out-of-memory condition
-		rm(d)
-		gc()
-	}
+derive<-function(d, filename) {
+  requireValid <- "Valid" %in% colnames(df)
+  selectFunction<-ifelse(grepl('RELIABILITY|_GEN_|INTERVIEW', filename), max, min)
+  d <- selectIteration(d, selectFunction, TRUE, requireValid)
+  if (grepl("^IMAGEN-IMGN_RELIABILITY", filename) || grepl("^IMAGEN-IMGN_FU_RELIABILITY", filename)) {
+    d <- deriveImagenReliability(d)
+    # Normalize task title name
+    filename <- sub("_FU_RELIABILITY((_[^-]*)?)-", "_RELIABILITY\\1_FU-", filename)
+  }
+  else if (grepl("^IMAGEN-IMGN_GEN", filename)) {
+    d <- deriveImagenGEN(d)
+  }
+  else if (grepl("^IMAGEN-IMGN_ADSR", filename)) {
+    d <- deriveImagenADRS(d)
+    # Typo in the ADRS task title name on the Delosis server
+    filename <- sub("_ADSR_", "_ADRS_", filename)
+  }
+  else if (grepl("IMGN_TCI3", filename)) {
+    d <- deriveImagenTCI3(d)
+  }
+  else if (grepl("IMGN_TCI", filename)) {
+    d <- deriveImagenTCI(d)
+  }
+  else if (grepl("IMGN_NEO_FFI", filename)) {
+    d <- deriveImagenNEO(d)
+  }
+  else if (grepl("IMGN_SURPS", filename)) {
+    d <- deriveSURPS(d)
+  }
+  else if (grepl("IMGN_MAST", filename)) {
+    d <- deriveImagenMAST(d)
+  }
+  else if (grepl("IMGN_CSI", filename)) {
+    d <- deriveImagenCSI(d)
+  }
+  else if (grepl("IMGN_IRI", filename)) {
+    d <- deriveImagenIRI(d)
+  }
+  else if (grepl("IMGN_AUDIT", filename)) {
+    d <- deriveImagenAUDIT(d)
+  }
+  else if (grepl("IMGN_ESPAD", filename)) {
+    d <- deriveImagenESPAD(d)
+  }
+  else if (grepl("IMGN_PDS", filename)) {
+    d <- deriveImagenPDS(d)
+  }
+  else if (grepl("IMGN_CTS", filename)) {
+    d <- deriveImagenCTS(d)
+  }
+  else if (grepl("IMGN_IDENT", filename)) {
+    d <- deriveImagenIDENT(d)
+  }
+  else if (grepl("IMGN_KIRBY", filename)) {
+    d <- deriveKIRBY(d)
+  }
+  else if (grepl("IMGN_DOT_PROBE", filename)) {
+    d <- deriveImagenDOTPROBE(d)
+  }
+  else if (grepl("IMGN_LEQ", filename)) {
+    d <- deriveLEQ(d)
+  }
+  else {
+    d <- rotateQuestionnaire(d)
+  } 
+  attr(d, 'filename')<-filename
+  return (d)
 }
 
+process <- function(psc2_dir, processed_dir) {
+  filenames <- list.files(psc2_dir)
+  
+  # split between PALP and other files
+  palp_filenames <- filenames[grepl("-IMGN_PALP_", filenames)]
+  filenames<-filenames[!filenames %in% palp_filenames]
+  
+  # split between Core1 and other files
+  Core1_filenames <- filenames[grepl("Core1", filenames)]
+  filenames<-filenames[!filenames %in% Core1_filenames]
+  
+  # split between  and other files
+  Core2_filenames <- filenames[grepl("Core2", filenames)]
+  filenames<-filenames[!filenames %in% Core2_filenames]
+  
+  
+  # concatenate PALP files
+  palp <- palp_filenames
+  if (length(palp)) {
+    # expect 1_1, 1_2, 1_3, etc. right after "-IMGN_PALP_"
+    p <- str_locate(palp, "-IMGN_PALP_")[,2] + 1
+    # order PALP files in lexicographical order: 1_1, 1_2, 1_3, 2_1, 2_2, 2_3
+    palp <- palp[order(substr(palp, p, p + 2))]
+    # read the first PALP file...
+    filepath <- file.path(psc2_dir, palp[1])
+    d <- selectIteration(read_psytools_csv(filepath))
+    # ...then concatenate the remaining PALP files
+    for (filename in palp[-1]) {
+      filepath <- file.path(psc2_dir, filename)
+      d <- rbind(d, selectIteration(read_psytools_csv(filepath)))
+    }
+    d <- pre_process(d)
+    d <- derivePALP(d)
+    
+    # Remove 1_1_
+    filename <- paste(substr(palp[1], 1, p - 2),
+                      substr(palp[1], p + 3, nchar(palp[1])), sep = "")
+    
+    filepath <- file.path(processed_dir, filename)
+    write_psytools_csv(d, filepath)
+    
+    # avoid out-of-memory condition
+    rm(d)
+    gc()
+  }
+  
+  # now iterate over non-PALP files if there are any
+  for (filename in filenames) {
+    filepath <- file.path(psc2_dir, filename)
+    
+    # Don't try and process a subdir
+    if(dir.exists(filepath)) next
+    d <- read_psytools_csv(filepath)
+    d <- pre_process(d)
+    
+    # Skip files without data - they cannot be rotated!
+    if (nrow(d) < 2) {
+      cat(filename, ": skipping file without data.", sep="", fill=TRUE)
+      next
+    }
+    d<-derive(d, filename)
+    filename<-attr(d, 'filename')
+    print(filename)
+    
+    filepath <- file.path(processed_dir, filename)
+    write_psytools_csv(d, filepath)
+    
+    # avoid out-of-memory condition
+    rm(d)
+    gc()
+  }
+  
+  # now deal with any Core1/2 files
+  for(coreList in list(Core1_filenames, Core2_filenames)) {
+    if(length(coreList)==0) next
+    require(data.table)
+    dList <-
+      convertFU3toFU2(as.data.table(rbindlist(
+        lapply(
+          as.list(paste0(psc2_dir, coreList)),
+          FUN = read.csv,
+          stringsAsFactors = FALSE
+        ), fill = TRUE
+      )))
+    for(filename in names(dList)) {
+      print(filename)
+      d<-dList[[filename]]
+      d <- pre_process(d)
+      
+      # Skip files without data - they cannot be rotated!
+      if (nrow(d) < 2) {
+        cat(filename, ": skipping file without data.", sep="", fill=TRUE)
+        next
+      }
+      d<-derive(d, filename)
+      filename<-attr(d, 'filename')
+      filepath <- file.path(processed_dir, filename)
+      write_psytools_csv(d, filepath)
+      
+      # avoid out-of-memory condition
+      rm(d)
+      gc()
+    
+      
+    }
+  }
+}
 
 process(PSYTOOLS_BL_PSC1_DIR, PSYTOOLS_BL_DERIVED_DIR)
 process(PSYTOOLS_FU1_PSC1_DIR, PSYTOOLS_FU1_DERIVED_DIR)
