@@ -114,10 +114,10 @@ derive<-function(d, filename) {
     d <- deriveImagenTCI3(d)
   }
   else if (grepl("IMGN_TCI", filename)) {
-    d <- deriveImagenTCI(d)
+    d <- deriveImagenTCI(d, grepl('FU3', filename))
   }
   else if (grepl("IMGN_NEO_FFI", filename)) {
-    d <- deriveImagenNEO(d)
+    d <- deriveImagenNEO(d, grepl('FU3', filename))
   }
   else if (grepl("IMGN_SURPS", filename)) {
     d <- deriveSURPS(d)
