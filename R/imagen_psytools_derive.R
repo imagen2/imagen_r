@@ -57,22 +57,22 @@ escape <- function(x) {
 
 read_psytools_csv <- function(file) {
 	COL_CLASSES = c(
-		"User.code"="character",
-		"Block"="character",
-		"Trial"="character",
-		"Response.time..ms."="numeric")
-	d <- read.csv(file, colClasses=COL_CLASSES, stringsAsFactors=FALSE)
+		User.code = "character",
+		Block = "character",
+		Trial = "character",
+		Response.time..ms. = "numeric")
+	d <- read.csv(file, colClasses = COL_CLASSES, stringsAsFactors = FALSE)
 
 	return (d)
 }
 
 
-pre_process <-function(d) {
+pre_process <- function(d) {
 	# Add an index to preserve order
 	d$rowIndex <- seq_len(nrow(d))
 
 	# Get rid of Demo, MOCK, NPPILOT and TEST user codes (PSC1-only)
-	d <- subset(d, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case=TRUE))
+	d <- subset(d, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case = TRUE))
 
 	return (d)
 }
@@ -88,14 +88,14 @@ write_psytools_csv <- function(d, file) {
 	columns <- sub("\\.ms\\.", "[ms]", colnames(d))  # Response time [ms]
 	columns <- gsub("\\.", " ", columns)
 
-	write.table(d, file, quote=FALSE, sep=",", na="",
-				row.names=FALSE, col.names=columns)
+	write.table(d, file, quote = FALSE, sep = ",", na = "",
+				row.names = FALSE, col.names = columns)
 }
 
 
-derive<-function(d, filename) {
+derive <- function(d, filename) {
   requireValid <- "Valid" %in% colnames(df)
-  selectFunction<-ifelse(grepl('RELIABILITY|_GEN_|INTERVIEW', filename), max, min)
+  selectFunction <- ifelse(grepl('RELIABILITY|_GEN_|INTERVIEW', filename), max, min)
   d <- selectIteration(d, selectFunction, TRUE, requireValid)
   if (grepl("^IMAGEN-IMGN_RELIABILITY", filename) || grepl("^IMAGEN-IMGN_FU_RELIABILITY", filename)) {
     d <- deriveImagenReliability(d)
@@ -157,27 +157,26 @@ derive<-function(d, filename) {
   }
   else {
     d <- rotateQuestionnaire(d)
-  } 
-  attr(d, 'filename')<-filename
+  }
+  attr(d, 'filename') <- filename
   return (d)
 }
 
 process <- function(psc2_dir, processed_dir) {
   filenames <- list.files(psc2_dir)
-  
+
   # split between PALP and other files
   palp_filenames <- filenames[grepl("-IMGN_PALP_", filenames)]
-  filenames<-filenames[!filenames %in% palp_filenames]
-  
+  filenames <- filenames[!filenames %in% palp_filenames]
+
   # split between Core1 and other files
   Core1_filenames <- filenames[grepl("Core1", filenames)]
-  filenames<-filenames[!filenames %in% Core1_filenames]
-  
-  # split between  and other files
+  filenames <- filenames[!filenames %in% Core1_filenames]
+
+  # split between Core2 and other files
   Core2_filenames <- filenames[grepl("Core2", filenames)]
-  filenames<-filenames[!filenames %in% Core2_filenames]
-  
-  
+  filenames <- filenames[!filenames %in% Core2_filenames]
+
   # concatenate PALP files
   palp <- palp_filenames
   if (length(palp)) {
@@ -195,48 +194,48 @@ process <- function(psc2_dir, processed_dir) {
     }
     d <- pre_process(d)
     d <- derivePALP(d)
-    
+
     # Remove 1_1_
     filename <- paste(substr(palp[1], 1, p - 2),
                       substr(palp[1], p + 3, nchar(palp[1])), sep = "")
-    
+
     filepath <- file.path(processed_dir, filename)
     write_psytools_csv(d, filepath)
-    
+
     # avoid out-of-memory condition
     rm(d)
     gc()
   }
-  
+
   # now iterate over non-PALP files if there are any
   for (filename in filenames) {
     filepath <- file.path(psc2_dir, filename)
-    
+
     # Don't try and process a subdir
-    if(dir.exists(filepath)) next
+    if (dir.exists(filepath)) next
     d <- read_psytools_csv(filepath)
     d <- pre_process(d)
-    
+
     # Skip files without data - they cannot be rotated!
     if (nrow(d) < 2) {
-      cat(filename, ": skipping file without data.", sep="", fill=TRUE)
+      cat(filename, ": skipping file without data.", sep = "", fill = TRUE)
       next
     }
-    d<-derive(d, filename)
-    filename<-attr(d, 'filename')
+    d <- derive(d, filename)
+    filename <- attr(d, 'filename')
     print(filename)
-    
+
     filepath <- file.path(processed_dir, filename)
     write_psytools_csv(d, filepath)
-    
+
     # avoid out-of-memory condition
     rm(d)
     gc()
   }
-  
+
   # now deal with any Core1/2 files
-  for(coreList in list(Core1_filenames, Core2_filenames)) {
-    if(length(coreList)==0) next
+  for (coreList in list(Core1_filenames, Core2_filenames)) {
+    if (length(coreList) == 0) next
     require(data.table)
     dList <-
       convertFU3toFU2(as.data.table(rbindlist(
@@ -246,26 +245,24 @@ process <- function(psc2_dir, processed_dir) {
           stringsAsFactors = FALSE
         ), fill = TRUE
       )))
-    for(filename in names(dList)) {
+    for (filename in names(dList)) {
       print(filename)
-      d<-dList[[filename]]
+      d <- dList[[filename]]
       d <- pre_process(d)
-      
+
       # Skip files without data - they cannot be rotated!
       if (nrow(d) < 2) {
-        cat(filename, ": skipping file without data.", sep="", fill=TRUE)
+        cat(filename, ": skipping file without data.", sep = "", fill = TRUE)
         next
       }
-      d<-derive(d, filename)
-      filename<-attr(d, 'filename')
+      d <- derive(d, filename)
+      filename <- attr(d, 'filename')
       filepath <- file.path(processed_dir, filename)
       write_psytools_csv(d, filepath)
-      
+
       # avoid out-of-memory condition
       rm(d)
       gc()
-    
-      
     }
   }
 }
