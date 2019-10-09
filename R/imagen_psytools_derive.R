@@ -170,12 +170,16 @@ process <- function(psc2_dir, processed_dir) {
   filenames <- filenames[!filenames %in% palp_filenames]
 
   # split between Core1 and other files
-  Core1_filenames <- filenames[grepl("Core1", filenames)]
-  filenames <- filenames[!filenames %in% Core1_filenames]
+  core1_filenames <- filenames[grepl("Core1", filenames)]
+  filenames <- filenames[!filenames %in% core1_filenames]
 
   # split between Core2 and other files
-  Core2_filenames <- filenames[grepl("Core2", filenames)]
-  filenames <- filenames[!filenames %in% Core2_filenames]
+  core2_filenames <- filenames[grepl("Core2", filenames)]
+  filenames <- filenames[!filenames %in% core2_filenames]
+
+  # for now get rid of FU2 Parent LimeSurvey files!
+  parent_filenames <- filenames[grepl("Parent", filenames)]
+  filenames <- filenames[!filenames %in% parent_filenames]
 
   # concatenate PALP files
   palp <- palp_filenames
@@ -234,13 +238,13 @@ process <- function(psc2_dir, processed_dir) {
   }
 
   # now deal with any Core1/2 files
-  for (coreList in list(Core1_filenames, Core2_filenames)) {
+  for (coreList in list(core1_filenames, core2_filenames)) {
     if (length(coreList) == 0) next
     require(data.table)
     dList <-
       convertFU3toFU2(as.data.table(rbindlist(
         lapply(
-          as.list(paste0(psc2_dir, coreList)),
+          as.list(file.path(psc2_dir, coreList)),
           FUN = read.csv,
           stringsAsFactors = FALSE
         ), fill = TRUE
