@@ -177,9 +177,11 @@ process <- function(psc2_dir, processed_dir) {
   core2_filenames <- filenames[grepl("Core2", filenames)]
   filenames <- filenames[!filenames %in% core2_filenames]
 
-  # for now get rid of FU2 Parent LimeSurvey files!
+  # for now get rid of FU2 Parent and Stratify Screening LimeSurvey files!
   parent_filenames <- filenames[grepl("Parent", filenames)]
   filenames <- filenames[!filenames %in% parent_filenames]
+  screening_filenames <- filenames[grepl("Screening", filenames, ignore.case = TRUE)]
+  filenames <- filenames[!filenames %in% screening_filenames]
 
   # concatenate PALP files
   palp <- palp_filenames
