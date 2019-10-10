@@ -224,7 +224,7 @@ process <- function(psc2_dir, processed_dir) {
   # now deal with any Core1/2 files
   for (coreList in list(core1_filenames, core2_filenames)) {
     if (length(coreList) == 0) next
-    require(data.table)
+    require(data.table, quietly = TRUE)
     dList <-
       convertFU3toFU2(as.data.table(rbindlist(
         lapply(
