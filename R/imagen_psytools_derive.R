@@ -144,7 +144,7 @@ derive <- function(d, filename) {
   return(d)
 }
 
-process <- function(psc2_dir, processed_dir) {
+process <- function(psc2_dir, processed_dir, prefix = NULL) {
   filenames <- list.files(psc2_dir)
 
   # split between PALP and other files
@@ -244,7 +244,7 @@ process <- function(psc2_dir, processed_dir) {
         next
       }
       d <- derive(d, filename)
-      filename <- attr(d, "filename")
+      filename <- paste0(prefix, attr(d, "filename"), ".csv")
       filepath <- file.path(processed_dir, filename)
       write_psytools_csv(d, filepath)
 
@@ -258,5 +258,5 @@ process <- function(psc2_dir, processed_dir) {
 process(PSYTOOLS_BL_PSC1_DIR, PSYTOOLS_BL_DERIVED_DIR)
 process(PSYTOOLS_FU1_PSC1_DIR, PSYTOOLS_FU1_DERIVED_DIR)
 process(PSYTOOLS_FU2_PSC1_DIR, PSYTOOLS_FU2_DERIVED_DIR)
-process(PSYTOOLS_FU3_PSC1_DIR, PSYTOOLS_FU3_DERIVED_DIR)
-process(PSYTOOLS_SB_PSC1_DIR, PSYTOOLS_SB_DERIVED_DIR)
+process(PSYTOOLS_FU3_PSC1_DIR, PSYTOOLS_FU3_DERIVED_DIR, prefix = "IMAGEN-")
+process(PSYTOOLS_SB_PSC1_DIR, PSYTOOLS_SB_DERIVED_DIR, prefix = "STRATIFY-")
