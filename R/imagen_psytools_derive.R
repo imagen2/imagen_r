@@ -51,19 +51,19 @@ escape <- function(x) {
     # Enclose in quotation marks strings with commas or quotation marks
     x <- gsub('^(.*[",\\;].*$)', '"\\1"', x)
   }
-  return (x)
+  return(x)
 }
 
 
 read_psytools_csv <- function(file) {
-	COL_CLASSES = c(
+	COL_CLASSES <- c(
 		User.code = "character",
 		Block = "character",
 		Trial = "character",
 		Response.time..ms. = "numeric")
 	d <- read.csv(file, colClasses = COL_CLASSES, stringsAsFactors = FALSE)
 
-	return (d)
+	return(d)
 }
 
 
@@ -74,14 +74,14 @@ pre_process <- function(d) {
 	# Get rid of Demo, MOCK, NPPILOT and TEST user codes (PSC1-only)
 	d <- subset(d, !grepl("TEST|THOMAS_PRONK|MAREN", User.code, ignore.case = TRUE))
 
-	return (d)
+	return(d)
 }
 
 
 write_psytools_csv <- function(d, file) {
 	# Roll our own quoting method
 	for (column in colnames(d)) {
-		d[,column] <- escape(d[,column])
+		d[, column] <- escape(d[, column])
 	}
 
 	# Undo R column name mangling
@@ -95,71 +95,53 @@ write_psytools_csv <- function(d, file) {
 
 derive <- function(d, filename) {
   requireValid <- "Valid" %in% colnames(df)
-  selectFunction <- ifelse(grepl('RELIABILITY|_GEN_|INTERVIEW', filename), max, min)
+  selectFunction <- ifelse(grepl("RELIABILITY|_GEN_|INTERVIEW", filename), max, min)
   d <- selectIteration(d, selectFunction, TRUE, requireValid)
   if (grepl("^IMAGEN-IMGN_RELIABILITY", filename) || grepl("^IMAGEN-IMGN_FU_RELIABILITY", filename)) {
     d <- deriveImagenReliability(d)
     # Normalize task title name
     filename <- sub("_FU_RELIABILITY((_[^-]*)?)-", "_RELIABILITY\\1_FU-", filename)
-  }
-  else if (grepl("^IMAGEN-IMGN_GEN", filename)) {
+  } else if (grepl("^IMAGEN-IMGN_GEN", filename)) {
     d <- deriveImagenGEN(d)
-  }
-  else if (grepl("^IMAGEN-IMGN_ADSR", filename)) {
+  } else if (grepl("^IMAGEN-IMGN_ADSR", filename)) {
     d <- deriveImagenADRS(d)
     # Typo in the ADRS task title name on the Delosis server
     filename <- sub("_ADSR_", "_ADRS_", filename)
-  }
-  else if (grepl("IMGN_TCI3", filename)) {
+  } else if (grepl("IMGN_TCI3", filename)) {
     d <- deriveImagenTCI3(d)
-  }
-  else if (grepl("IMGN_TCI", filename)) {
-    d <- deriveImagenTCI(d, grepl('FU3', filename))
-  }
-  else if (grepl("IMGN_NEO_FFI", filename)) {
-    d <- deriveImagenNEO(d, grepl('FU3', filename))
-  }
-  else if (grepl("IMGN_SURPS", filename)) {
+  } else if (grepl("IMGN_TCI", filename)) {
+    d <- deriveImagenTCI(d, grepl("FU3", filename))
+  } else if (grepl("IMGN_NEO_FFI", filename)) {
+    d <- deriveImagenNEO(d, grepl("FU3", filename))
+  } else if (grepl("IMGN_SURPS", filename)) {
     d <- deriveSURPS(d)
-  }
-  else if (grepl("IMGN_MAST", filename)) {
+  } else if (grepl("IMGN_MAST", filename)) {
     d <- deriveImagenMAST(d)
-  }
-  else if (grepl("IMGN_CSI", filename)) {
+  } else if (grepl("IMGN_CSI", filename)) {
     d <- deriveImagenCSI(d)
-  }
-  else if (grepl("IMGN_IRI", filename)) {
+  } else if (grepl("IMGN_IRI", filename)) {
     d <- deriveImagenIRI(d)
-  }
-  else if (grepl("IMGN_AUDIT", filename)) {
+  } else if (grepl("IMGN_AUDIT", filename)) {
     d <- deriveImagenAUDIT(d)
-  }
-  else if (grepl("IMGN_ESPAD", filename)) {
+  } else if (grepl("IMGN_ESPAD", filename)) {
     d <- deriveImagenESPAD(d)
-  }
-  else if (grepl("IMGN_PDS", filename)) {
+  } else if (grepl("IMGN_PDS", filename)) {
     d <- deriveImagenPDS(d)
-  }
-  else if (grepl("IMGN_CTS", filename)) {
+  } else if (grepl("IMGN_CTS", filename)) {
     d <- deriveImagenCTS(d)
-  }
-  else if (grepl("IMGN_IDENT", filename)) {
+  } else if (grepl("IMGN_IDENT", filename)) {
     d <- deriveImagenIDENT(d)
-  }
-  else if (grepl("IMGN_KIRBY", filename)) {
+  } else if (grepl("IMGN_KIRBY", filename)) {
     d <- deriveKIRBY(d)
-  }
-  else if (grepl("IMGN_DOT_PROBE", filename)) {
+  } else if (grepl("IMGN_DOT_PROBE", filename)) {
     d <- deriveImagenDOTPROBE(d)
-  }
-  else if (grepl("IMGN_LEQ", filename)) {
+  } else if (grepl("IMGN_LEQ", filename)) {
     d <- deriveLEQ(d)
-  }
-  else {
+  } else {
     d <- rotateQuestionnaire(d)
   }
-  attr(d, 'filename') <- filename
-  return (d)
+  attr(d, "filename") <- filename
+  return(d)
 }
 
 process <- function(psc2_dir, processed_dir) {
@@ -186,8 +168,8 @@ process <- function(psc2_dir, processed_dir) {
   # concatenate PALP files
   palp <- palp_filenames
   if (length(palp)) {
-    # expect 1_1, 1_2, 1_3, etc. right after "-IMGN_PALP_"
-    p <- str_locate(palp, "-IMGN_PALP_")[,2] + 1
+    # expect 1_1, 1_2, 1_3, etc. right after '-IMGN_PALP_'
+    p <- str_locate(palp, "-IMGN_PALP_")[, 2] + 1
     # order PALP files in lexicographical order: 1_1, 1_2, 1_3, 2_1, 2_2, 2_3
     palp <- palp[order(substr(palp, p, p + 2))]
     # read the first PALP file...
@@ -228,7 +210,7 @@ process <- function(psc2_dir, processed_dir) {
       next
     }
     d <- derive(d, filename)
-    filename <- attr(d, 'filename')
+    filename <- attr(d, "filename")
     print(filename)
 
     filepath <- file.path(processed_dir, filename)
@@ -262,7 +244,7 @@ process <- function(psc2_dir, processed_dir) {
         next
       }
       d <- derive(d, filename)
-      filename <- attr(d, 'filename')
+      filename <- attr(d, "filename")
       filepath <- file.path(processed_dir, filename)
       write_psytools_csv(d, filepath)
 
