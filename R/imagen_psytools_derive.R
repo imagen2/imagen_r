@@ -211,7 +211,6 @@ process <- function(psc2_dir, processed_dir, prefix = NULL) {
     }
     d <- derive(d, filename)
     filename <- attr(d, "filename")
-    print(filename)
 
     filepath <- file.path(processed_dir, filename)
     write_psytools_csv(d, filepath)
@@ -234,7 +233,6 @@ process <- function(psc2_dir, processed_dir, prefix = NULL) {
         ), fill = TRUE
       )))
     for (filename in names(dList)) {
-      print(filename)
       d <- dList[[filename]]
       d <- pre_process(d)
 
