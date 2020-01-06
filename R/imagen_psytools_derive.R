@@ -48,8 +48,8 @@ escape <- function(x) {
   if ("character" %in% class(x)) {
     # Escape double quotation marks by doubling them
     x <- gsub('"', '""', x)
-    # Enclose in quotation marks strings with commas or quotation marks
-    x <- gsub('^(.*[",\\;].*$)', '"\\1"', x)
+    # Enclose in quotation marks strings with new lines, commas or quotation marks
+    x <- gsub('^(.*[\n",\\;].*$)', '"\\1"', x)
   }
   return(x)
 }
