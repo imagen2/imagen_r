@@ -97,7 +97,8 @@ derive <- function(d, filename) {
   requireValid <- "Valid" %in% colnames(df)
   selectFunction <- ifelse(grepl("RELIABILITY|_GEN_|INTERVIEW|_MINI5_", filename), max, min)
   allowIncomplete <- ifelse(grepl("_MINI5_", filename), TRUE, FALSE)
-  d <- selectIteration(d, selectFunction, TRUE, requireValid, allowIncomplete)  d <- selectIteration(d, selectFunction, TRUE, requireValid)
+  d <- selectIteration(d, selectFunction, TRUE, requireValid, allowIncomplete)
+  d <- selectIteration(d, selectFunction, TRUE, requireValid)
   if (grepl("^IMAGEN-IMGN_RELIABILITY", filename) || grepl("^IMAGEN-IMGN_FU_RELIABILITY", filename)) {
     d <- deriveImagenReliability(d)
     # Normalize task title name
