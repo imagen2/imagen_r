@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# Copyright (c) 2017-2019 CEA
+# Copyright (c) 2017-2020 CEA
 #
 # This software is governed by the CeCILL license under French law and
 # abiding by the rules of distribution of free software. You can use,
@@ -31,6 +31,7 @@
 library(tools)
 library(Psytools)
 library(stringr)  # str_locate
+library(data.table)
 
 
 PSYTOOLS_BL_PSC1_DIR <- "/neurospin/imagen/BL/RAW/PSC1/psytools"
@@ -41,8 +42,17 @@ PSYTOOLS_FU2_PSC1_DIR <- "/neurospin/imagen/FU2/RAW/PSC1/psytools"
 PSYTOOLS_FU2_DERIVED_DIR <- "/tmp/imagen/FU2/processed/psytools"
 PSYTOOLS_FU3_PSC1_DIR <- "/neurospin/imagen/FU3/RAW/PSC1/psytools"
 PSYTOOLS_FU3_DERIVED_DIR <- "/tmp/imagen/FU3/processed/psytools"
-PSYTOOLS_SB_PSC1_DIR <- "/neurospin/imagen/STRATIFY/RAW/PSC1/psytools"
-PSYTOOLS_SB_DERIVED_DIR <- "/tmp/imagen/STRATIFY/processed/psytools"
+PSYTOOLS_STRATIFY_PSC1_DIR <- "/neurospin/imagen/STRATIFY/RAW/PSC1/psytools"
+PSYTOOLS_STRATIFY_DERIVED_DIR <- "/tmp/imagen/STRATIFY/processed/psytools"
+PSYTOOLS_IMACOV19_BL_PSC1_DIR <- "/neurospin/imagen/IMACOV19_BL/RAW/PSC1/psytools"
+PSYTOOLS_IMACOV19_BL_DERIVED_DIR <- "/tmp/imagen/IMACOV19_BL/processed/psytools"
+PSYTOOLS_IMACOV19_FU_PSC1_DIR <- "/neurospin/imagen/IMACOV19_FU/RAW/PSC1/psytools"
+PSYTOOLS_IMACOV19_FU_DERIVED_DIR <- "/tmp/imagen/IMACOV19_FU/processed/psytools"
+PSYTOOLS_STRATICO19_BL_PSC1_DIR <- "/neurospin/imagen/STRATICO19_BL/RAW/PSC1/psytools"
+PSYTOOLS_STRATICO19_BL_DERIVED_DIR <- "/tmp/imagen/STRATICO19_BL/processed/psytools"
+PSYTOOLS_STRATICO19_FU_PSC1_DIR <- "/neurospin/imagen/STRATICO19_FU/RAW/PSC1/psytools"
+PSYTOOLS_STRATICO19_FU_DERIVED_DIR <- "/tmp/imagen/STRATICO19_FU/processed/psytools"
+
 
 escape <- function(x) {
     if ("character" %in% class(x)) {
@@ -146,7 +156,7 @@ derive <- function(d, filename) {
     return(d)
 }
 
-process <- function(psc2_dir, processed_dir, prefix = NULL) {
+process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extra = TRUE) {
     filenames <- list.files(psc2_dir)
 
     # split between PALP and other files
@@ -160,6 +170,14 @@ process <- function(psc2_dir, processed_dir, prefix = NULL) {
     # split between Core2 and other files
     core2_filenames <- filenames[grepl("Core2", filenames)]
     filenames <- filenames[!filenames %in% core2_filenames]
+
+    # split between IMACOV19 and other files
+    imacov19_filenames <- filenames[grepl("IMACOV19", filenames)]
+    filenames <- filenames[!filenames %in% imacov19_filenames]
+
+    # split between STRATICO19 and other files
+    stratico19_filenames <- filenames[grepl("STRATICO19", filenames)]
+    filenames <- filenames[!filenames %in% stratico19_filenames]
 
     # for now get rid of FU2 Parent and Stratify Screening LimeSurvey files!
     parent_filenames <- filenames[grepl("Parent", filenames)]
@@ -223,24 +241,21 @@ process <- function(psc2_dir, processed_dir, prefix = NULL) {
         gc()
     }
 
-    # now deal with any Core1/2 files
-    for (coreList in list(core1_filenames, core2_filenames)) {
+    # now deal with any Core1/2 and Covid-19 files
+    for (coreList in list(core1_filenames, core2_filenames, imacov19_filenames, stratico19_filenames)) {
         if (length(coreList) == 0)
             next
-        require(data.table, quietly = TRUE)
-        dList <-
-        convertFU3toFU2(as.data.table(rbindlist(
+        dList <- convertFU3toFU2(as.data.table(rbindlist(
             lapply(
                 as.list(file.path(psc2_dir, coreList)),
                 FUN = read.csv,
                 stringsAsFactors = FALSE
-            ), fill = TRUE
-        )))
+            ), fill = TRUE)), subInstrumentSuffix = suffix, retainAdditionalData = extra)
         for (filename in names(dList)) {
             d <- dList[[filename]]
             d <- pre_process(d)
 
-            # Skip files without data - they cannot be rotated!
+            # Skip files without data - they cannot be derived!
             if (nrow(d) < 2) {
                 cat(filename, ": skipping file without data.", sep = "", fill = TRUE)
                 next
@@ -260,5 +275,9 @@ process <- function(psc2_dir, processed_dir, prefix = NULL) {
 process(PSYTOOLS_BL_PSC1_DIR, PSYTOOLS_BL_DERIVED_DIR)
 process(PSYTOOLS_FU1_PSC1_DIR, PSYTOOLS_FU1_DERIVED_DIR)
 process(PSYTOOLS_FU2_PSC1_DIR, PSYTOOLS_FU2_DERIVED_DIR)
-process(PSYTOOLS_FU3_PSC1_DIR, PSYTOOLS_FU3_DERIVED_DIR, prefix = "IMAGEN-")
-process(PSYTOOLS_SB_PSC1_DIR, PSYTOOLS_SB_DERIVED_DIR, prefix = "STRATIFY-")
+process(PSYTOOLS_FU3_PSC1_DIR, PSYTOOLS_FU3_DERIVED_DIR, prefix = "IMAGEN-", suffix = "FU3", extra = FALSE)
+process(PSYTOOLS_STRATIFY_PSC1_DIR, PSYTOOLS_STRATIFY_DERIVED_DIR, prefix = "STRATIFY-", suffix = NULL, extra = FALSE)
+process(PSYTOOLS_IMACOV19_BL_PSC1_DIR, PSYTOOLS_IMACOV19_BL_DERIVED_DIR, prefix = "IMACOV19-", suffix = "BL")
+process(PSYTOOLS_IMACOV19_FU_PSC1_DIR, PSYTOOLS_IMACOV19_FU_DERIVED_DIR, prefix = "IMACOV19-", suffix = "FU")
+process(PSYTOOLS_STRATICO19_BL_PSC1_DIR, PSYTOOLS_STRATICO19_BL_DERIVED_DIR, prefix = "STRATICO19-", suffix = "BL")
+process(PSYTOOLS_STRATICO19_FU_PSC1_DIR, PSYTOOLS_STRATICO19_FU_DERIVED_DIR, prefix = "STRATICO19-", suffix = "FU")
