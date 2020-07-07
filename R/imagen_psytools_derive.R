@@ -149,6 +149,8 @@ derive <- function(d, filename) {
         d <- deriveImagenDOTPROBE(d)
     } else if (grepl("IMGN_LEQ", filename)) {
         d <- deriveLEQ(d)
+    } else if (grepl("IMGN_SRS", filename)) {
+        d <- deriveSRS(d)
     } else {
         d <- rotateQuestionnaire(d)
     }
