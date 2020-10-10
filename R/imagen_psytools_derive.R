@@ -125,7 +125,7 @@ derive <- function(d, filename) {
     } else if (grepl("IMGN_NEO_FFI", filename)) {
         d <- deriveImagenNEO(d, grepl("FU3", filename))
     } else if (grepl("IMGN_SURPS", filename)) {
-        d <- deriveSURPS(d)
+        d <- deriveSURPS(d, grepl("FU3", filename))
     } else if (grepl("IMGN_MAST", filename)) {
         d <- deriveImagenMAST(d)
     } else if (grepl("IMGN_CSI", filename)) {
