@@ -157,6 +157,7 @@ derive <- function(d, filename) {
     return(d)
 }
 
+
 process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extra = TRUE) {
     filenames <- list.files(psc2_dir)
 
@@ -228,7 +229,7 @@ process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extr
 
         # Skip files without data - they cannot be rotated!
         if (nrow(d) < 2) {
-            cat(filename, ": skipping file without data.", sep = "", fill = TRUE)
+            message(filename, ": skipping file without data.")
             next
         }
         d <- derive(d, filename)
@@ -258,7 +259,7 @@ process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extr
 
             # Skip files without data - they cannot be derived!
             if (nrow(d) < 2) {
-                cat(filename, ": skipping file without data.", sep = "", fill = TRUE)
+                message(filename, ": skipping file without data.")
                 next
             }
             d <- derive(d, filename)
@@ -272,6 +273,7 @@ process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extr
         }
     }
 }
+
 
 process(PSYTOOLS_BL_PSC1_DIR, PSYTOOLS_BL_DERIVED_DIR)
 process(PSYTOOLS_FU1_PSC1_DIR, PSYTOOLS_FU1_DERIVED_DIR)
