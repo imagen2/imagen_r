@@ -103,7 +103,7 @@ write_psytools_csv <- function(d, file) {
 }
 
 
-derive <- function(d, filename) {
+derive <- function(d, filename, FU3style = FALSE) {
     requireValid <- "Valid" %in% colnames(df)
     selectFunction <- ifelse(grepl("RELIABILITY|_GEN_|INTERVIEW|_MINI5_", filename), max, min)
     allowIncomplete <- ifelse(grepl("_MINI5", filename), TRUE, FALSE)
@@ -121,11 +121,11 @@ derive <- function(d, filename) {
     } else if (grepl("IMGN_TCI3", filename)) {
         d <- deriveImagenTCI3(d)
     } else if (grepl("IMGN_TCI", filename)) {
-        d <- deriveImagenTCI(d, grepl("FU3", filename))
+        d <- deriveImagenTCI(d, FU3style)
     } else if (grepl("IMGN_NEO_FFI", filename)) {
-        d <- deriveImagenNEO(d, grepl("FU3", filename))
+        d <- deriveImagenNEO(d, FU3style)
     } else if (grepl("IMGN_SURPS", filename)) {
-        d <- deriveSURPS(d, grepl("FU3", filename))
+        d <- deriveSURPS(d, FU3style)
     } else if (grepl("IMGN_MAST", filename)) {
         d <- deriveImagenMAST(d)
     } else if (grepl("IMGN_CSI", filename)) {
@@ -262,7 +262,7 @@ process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extr
                 message(filename, ": skipping file without data.")
                 next
             }
-            d <- derive(d, filename)
+            d <- derive(d, filename, TRUE)
             filename <- paste0(prefix, attr(d, "filename"), ".csv")
             filepath <- file.path(processed_dir, filename)
             write_psytools_csv(d, filepath)
