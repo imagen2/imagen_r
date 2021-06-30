@@ -96,18 +96,41 @@ pre_process <- function(d) {
 }
 
 
-write_psytools_csv <- function(d, file) {
-    # Roll our own quoting method
-    for (column in colnames(d)) {
-        d[, column] <- escape(d[, column])
+write_psytools_csv <- function(d, file, splitSuffixes = c("FU")) {
+  # Roll our own quoting method
+  for (column in colnames(d)) {
+    d[, column] <- escape(d[, column])
+  }
+  
+  # Undo R column name mangling
+  columns <- sub("\\.ms\\.", "[ms]", colnames(d))  # Response time [ms]
+  columns <- gsub("\\.", " ", columns)
+
+  # Write all the splits requested
+  for (suffix in splitSuffixes){
+    dsplit <- d[grepl(paste0(suffix, "$"), d$User.code),  ]
+    if(nrow(dsplit)){
+        write.table(dsplit,
+                    str_replace(file,".csv", paste0("_",suffix, ".csv")) ,
+                    quote = FALSE,
+                    sep = ",",
+                    na = "",
+                    row.names = FALSE,
+                    col.names = columns)
     }
-
-    # Undo R column name mangling
-    columns <- sub("\\.ms\\.", "[ms]", colnames(d))  # Response time [ms]
-    columns <- gsub("\\.", " ", columns)
-
-    write.table(d, file, quote = FALSE, sep = ",", na = "",
-                row.names = FALSE, col.names = columns)
+  }
+  
+  #Finally write anything NOT included in splits
+  d <- d[!grepl(paste0(paste(splitSuffixes, collapse="$|"), "$"), d$User.code), ]
+  if(nrow(d)){
+    write.table(d,
+                file,
+                quote = FALSE,
+                sep = ",",
+                na = "",
+                row.names = FALSE,
+                col.names = columns)
+  }
 }
 
 
