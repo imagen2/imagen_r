@@ -109,7 +109,7 @@ write_psytools_csv <- function(d, file, splitSuffixes = c("FU")) {
   # Write all the splits requested
   for (suffix in splitSuffixes){
     dsplit <- d[grepl(paste0(suffix, "$"), d$User.code),  ]
-    if(nrow(dsplit)){
+    if (nrow(dsplit)) {
         write.table(dsplit,
                     str_replace(file,".csv", paste0("_",suffix, ".csv")) ,
                     quote = FALSE,
@@ -120,9 +120,9 @@ write_psytools_csv <- function(d, file, splitSuffixes = c("FU")) {
     }
   }
   
-  #Finally write anything NOT included in splits
+  # Finally write anything NOT included in splits
   d <- d[!grepl(paste0(paste(splitSuffixes, collapse="$|"), "$"), d$User.code), ]
-  if(nrow(d)){
+  if (nrow(d)) {
     write.table(d,
                 file,
                 quote = FALSE,
