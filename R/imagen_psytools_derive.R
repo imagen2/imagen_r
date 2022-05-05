@@ -44,6 +44,7 @@ PSYTOOLS_FU3_PSC1_DIR <- "/neurospin/imagen/FU3/RAW/PSC1/psytools"
 PSYTOOLS_FU3_DERIVED_DIR <- "/tmp/imagen/FU3/processed/psytools"
 PSYTOOLS_STRATIFY_PSC1_DIR <- "/neurospin/imagen/STRATIFY/RAW/PSC1/psytools"
 PSYTOOLS_STRATIFY_DERIVED_DIR <- "/tmp/imagen/STRATIFY/processed/psytools"
+PSYTOOLS_STRATIFY_FU_DERIVED_DIR <- "/tmp/imagen/STRATIFY_FU/processed/psytools"
 PSYTOOLS_IMACOV19_BL_PSC1_DIR <- "/neurospin/imagen/IMACOV19_BL/RAW/PSC1/psytools"
 PSYTOOLS_IMACOV19_BL_DERIVED_DIR <- "/tmp/imagen/IMACOV19_BL/processed/psytools"
 PSYTOOLS_IMACOV19_FU_PSC1_DIR <- "/neurospin/imagen/IMACOV19_FU/RAW/PSC1/psytools"
@@ -96,7 +97,7 @@ pre_process <- function(d) {
 }
 
 
-write_psytools_csv <- function(d, file, splitSuffixes = c("FU")) {
+write_psytools_csv <- function(d, folder, filename, splitSuffixes = NULL) {
   # Roll our own quoting method
   for (column in colnames(d)) {
     d[, column] <- escape(d[, column])
@@ -107,24 +108,35 @@ write_psytools_csv <- function(d, file, splitSuffixes = c("FU")) {
   columns <- gsub("\\.", " ", columns)
 
   # Write all the splits requested
-  for (suffix in splitSuffixes){
-    dsplit <- d[grepl(paste0(suffix, "$"), d$User.code),  ]
-    if (nrow(dsplit)) {
-        write.table(dsplit,
-                    str_replace(file,".csv", paste0("_",suffix, ".csv")) ,
+  if(!is.null(splitSuffixes)) {
+      for (suffix in names(splitSuffixes)){
+        dsplit <- d[grepl(paste0(suffix, "$"), d$User.code),  ]
+        if (nrow(dsplit)) {
+            write.table(dsplit,
+                    file.path(
+                          splitSuffixes[[suffix]],
+                          str_replace(
+                                filename,
+                                 ".csv",
+                                 paste0("_",suffix, ".csv")
+                                 )
+                    ),
                     quote = FALSE,
                     sep = ",",
                     na = "",
                     row.names = FALSE,
                     col.names = columns)
-    }
-  }
+        }
+      }
+   }
   
-  # Finally write anything NOT included in splits
-  d <- d[!grepl(paste0(paste(splitSuffixes, collapse="$|"), "$"), d$User.code), ]
+  # Finally write anything NOT included in splits (Or everything if no splits)
+  if(!is.null(splitSuffixes)) { 
+        d <- d[!grepl(paste0(paste(splitSuffixes, collapse="$|"), "$"), d$User.code), ]
+  }
   if (nrow(d)) {
-    write.table(d,
-                file,
+        write.table(d,
+                file.path(folder, filename),
                 quote = FALSE,
                 sep = ",",
                 na = "",
@@ -189,7 +201,7 @@ derive <- function(d, filename, FU3style = FALSE) {
 }
 
 
-process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extra = TRUE) {
+process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extra = TRUE, splitSuffixes = NULL) {
     filenames <- list.files(psc2_dir)
 
     # split between PALP and other files
@@ -240,8 +252,12 @@ process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extr
         filename <- paste(substr(palp[1], 1, p - 2),
                           substr(palp[1], p + 3, nchar(palp[1])), sep = "")
 
-        filepath <- file.path(processed_dir, filename)
-        write_psytools_csv(d, filepath)
+        write_psytools_csv(
+            d,
+            processed_dir,
+            filename,
+            splitSuffixes
+        )
 
         # avoid out-of-memory condition
         rm(d)
@@ -266,8 +282,12 @@ process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extr
         d <- derive(d, filename)
         filename <- attr(d, "filename")
 
-        filepath <- file.path(processed_dir, filename)
-        write_psytools_csv(d, filepath)
+        write_psytools_csv(
+            d,
+            processed_dir,
+            filename,
+            splitSuffixes
+        )
 
         # avoid out-of-memory condition
         rm(d)
@@ -295,8 +315,13 @@ process <- function(psc2_dir, processed_dir, prefix = NULL, suffix = "FU3", extr
             }
             d <- derive(d, filename, TRUE)
             filename <- paste0(prefix, attr(d, "filename"), ".csv")
-            filepath <- file.path(processed_dir, filename)
-            write_psytools_csv(d, filepath)
+            
+            write_psytools_csv(
+                d,
+                processed_dir,
+                filename, 
+                splitSuffixes
+            )
 
             # avoid out-of-memory condition
             rm(d)
@@ -310,7 +335,14 @@ process(PSYTOOLS_BL_PSC1_DIR, PSYTOOLS_BL_DERIVED_DIR)
 process(PSYTOOLS_FU1_PSC1_DIR, PSYTOOLS_FU1_DERIVED_DIR)
 process(PSYTOOLS_FU2_PSC1_DIR, PSYTOOLS_FU2_DERIVED_DIR)
 process(PSYTOOLS_FU3_PSC1_DIR, PSYTOOLS_FU3_DERIVED_DIR, prefix = "IMAGEN-", suffix = "FU3", extra = FALSE)
-process(PSYTOOLS_STRATIFY_PSC1_DIR, PSYTOOLS_STRATIFY_DERIVED_DIR, prefix = "STRATIFY-", suffix = NULL, extra = FALSE)
+process(
+    PSYTOOLS_STRATIFY_PSC1_DIR,
+    PSYTOOLS_STRATIFY_DERIVED_DIR,
+    prefix = "STRATIFY-",
+    suffix = NULL,
+    extra = FALSE,
+    splitSuffixes = list(SU=PSYTOOLS_STRATIFY_FU_DERIVED_DIR)
+)
 process(PSYTOOLS_IMACOV19_BL_PSC1_DIR, PSYTOOLS_IMACOV19_BL_DERIVED_DIR, prefix = "IMACOV19-", suffix = "BL")
 process(PSYTOOLS_IMACOV19_FU_PSC1_DIR, PSYTOOLS_IMACOV19_FU_DERIVED_DIR, prefix = "IMACOV19-", suffix = "FU")
 process(PSYTOOLS_IMACOV19_FU2_PSC1_DIR, PSYTOOLS_IMACOV19_FU2_DERIVED_DIR, prefix = "IMACOV19-", suffix = "FU2")
