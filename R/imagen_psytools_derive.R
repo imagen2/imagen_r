@@ -96,6 +96,11 @@ pre_process <- function(d) {
     return(d)
 }
 
+## splitSuffixes can now be a list containing suffixes found in the file 
+## and an alternative folder in which to store the resultant file
+##  eg list(SB=PSYTOOLS_STRATIFY_FU_DERIVED_DIR) 
+##     will store the file with User.code suffix of SU in a folder stored in
+##        PSYTOOLS_STRATIFY_FU_DERIVED_DIR
 
 write_psytools_csv <- function(d, folder, filename, splitSuffixes = NULL) {
   # Roll our own quoting method
